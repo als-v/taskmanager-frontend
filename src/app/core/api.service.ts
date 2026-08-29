@@ -5,29 +5,22 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface AuthUser {
-  id?: string;
+  id: string;
+  name: string;
   email: string;
-  nome?: string;
-  perfil?: string;
-  isAdmin?: boolean;
-  roles?: Record<string, unknown>;
 }
 
-export interface LoginResponse {
-  token: string;
+export interface AuthResponse {
+  access_token: string;
+  refresh_token: string;
+  token_type: string;
+  user: AuthUser;
 }
 
-export interface RegisterPayload {
-  nome: string;
+export interface SignUpPayload {
+  name: string;
   email: string;
-  telefone?: string;
-  perfil_solicitado?: string;
-  mensagem?: string;
-}
-
-export interface RoleOption {
-  codigo: string;
-  nome: string;
+  password: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -35,21 +28,19 @@ export class ApiService {
   private readonly http = inject(HttpClient);
   readonly apiUrl = environment.apiUrl.replace(/\/$/, '');
 
-  login(email: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${this.apiUrl}/api/auth/login`, { email, password });
+  login(email: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/api/auth/login`, { email, password });
   }
 
-  register(payload: RegisterPayload): Observable<void> {
-    return this.http.post<void>(`${this.apiUrl}/api/auth/register`, payload);
+  signUp(payload: SignUpPayload): Observable<AuthUser> {
+    return this.http.post<AuthUser>(`${this.apiUrl}/api/auth/signup`, payload);
   }
 
-  getProfile(token: string): Observable<AuthUser> {
-    return this.http.get<AuthUser>(`${this.apiUrl}/api/users/me`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+  refresh(refreshToken: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/api/auth/refresh`, { refresh_token: refreshToken });
   }
 
-  listRoles(): Observable<RoleOption[]> {
-    return this.http.get<RoleOption[]>(`${this.apiUrl}/api/roles`);
+  logout(refreshToken: string): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/api/auth/logout`, { refresh_token: refreshToken });
   }
 }

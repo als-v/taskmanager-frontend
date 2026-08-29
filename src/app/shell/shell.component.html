@@ -18,18 +18,6 @@
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16" /><path d="M6 20V8l6-4 6 4v12" /><path d="M10 20v-6h4v6" /></svg>
         <span>Projetos</span>
       </a>
-      <a class="menu-link" routerLink="/tarefas" routerLinkActive="active" title="Tarefas">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3 8-8" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
-        <span>Tarefas</span>
-      </a>
-      <a class="menu-link" *ngIf="auth.isAdmin()" routerLink="/usuarios" routerLinkActive="active" title="Usuarios">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" /><path d="M4 21a8 8 0 0 1 16 0" /></svg>
-        <span>Usuarios</span>
-      </a>
-      <a class="menu-link" *ngIf="auth.isAdmin()" routerLink="/admin" routerLinkActive="active" title="Administracao">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z" /><path d="M9 12l2 2 4-4" /></svg>
-        <span>Administracao</span>
-      </a>
     </nav>
   </aside>
 
@@ -42,11 +30,10 @@
 
       <div class="user-area" [class.open]="userMenuOpen()">
         <div class="user-summary">
-          <strong>{{ auth.session()?.nome || auth.session()?.email || 'Usuario' }}</strong>
-          <span>{{ platformName }}</span>
+          <strong>{{ auth.session()?.user?.name || auth.session()?.user?.email || 'Usuario' }}</strong>
         </div>
         <button class="avatar-button" type="button" aria-label="Abrir menu do usuario" aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen()" (click)="toggleUserMenu()">
-          <span class="avatar" aria-hidden="true">{{ (auth.session()?.nome || auth.session()?.email || 'U').charAt(0).toUpperCase() }}</span>
+          <span class="avatar" aria-hidden="true">{{ (auth.session()?.user?.name || auth.session()?.user?.email || 'U').charAt(0).toUpperCase() }}</span>
           <svg class="user-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 10l4 4 4-4" /></svg>
         </button>
 

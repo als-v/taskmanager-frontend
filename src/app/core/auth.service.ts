@@ -1,18 +1,16 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, map, switchMap, tap } from 'rxjs';
+import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
 
-import { ApiService, AuthUser, RegisterPayload } from './api.service';
+import { ApiService, AuthResponse, AuthUser, SignUpPayload } from './api.service';
 
 const TOKEN_STORAGE_KEY = 'taskmanager.jwt';
+const REFRESH_STORAGE_KEY = 'taskmanager.refresh';
 const PROFILE_STORAGE_KEY = 'taskmanager.profile';
 
 export interface AuthSession {
-  token: string;
-  email: string;
-  nome?: string;
-  perfil: string;
-  isAdmin: boolean;
-  roles?: Record<string, unknown>;
+  accessToken: string;
+  refreshToken: string;
+  user: AuthUser;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -23,7 +21,6 @@ export class AuthService {
 
   readonly isAuthenticated = computed(() => Boolean(this.tokenState()));
   readonly session = computed(() => this.profileState());
-  readonly isAdmin = computed(() => this.session()?.isAdmin ?? false);
 
   constructor() {
     clearLegacyLocalStorage();
@@ -33,48 +30,73 @@ export class AuthService {
     return this.tokenState();
   }
 
+  private get refreshTokenValue(): string | null {
+    return this.profileState()?.refreshToken ?? sessionStorage.getItem(REFRESH_STORAGE_KEY);
+  }
+
   login(email: string, password: string): Observable<AuthSession> {
     const normalizedEmail = normalizeEmail(email);
 
     return this.api.login(normalizedEmail, password).pipe(
-      map((response) => response.token ?? ''),
-      switchMap((token) =>
-        this.api.getProfile(token).pipe(map((user) => this.buildSession(token, user)))
-      ),
+      map((response) => this.buildSession(response)),
       tap((session) => this.setSession(session))
     );
   }
 
-  register(payload: RegisterPayload): Observable<void> {
-    return this.api.register(payload);
+  signUp(payload: SignUpPayload): Observable<AuthUser> {
+    return this.api.signUp({ ...payload, email: normalizeEmail(payload.email) });
+  }
+
+  refreshSession(): Observable<AuthSession> {
+    const refreshToken = this.refreshTokenValue;
+
+    if (!refreshToken) {
+      return throwError(() => new Error('No refresh token available'));
+    }
+
+    return this.api.refresh(refreshToken).pipe(
+      map((response) => this.buildSession(response)),
+      tap((session) => this.setSession(session))
+    );
   }
 
   logout(): void {
-    sessionStorage.removeItem(TOKEN_STORAGE_KEY);
-    sessionStorage.removeItem(PROFILE_STORAGE_KEY);
-    clearLegacyLocalStorage();
-    this.tokenState.set(null);
-    this.profileState.set(null);
+    const refreshToken = this.refreshTokenValue;
+
+    const clearLocal = () => {
+      sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+      sessionStorage.removeItem(REFRESH_STORAGE_KEY);
+      sessionStorage.removeItem(PROFILE_STORAGE_KEY);
+      clearLegacyLocalStorage();
+      this.tokenState.set(null);
+      this.profileState.set(null);
+    };
+
+    if (refreshToken) {
+      this.api
+        .logout(refreshToken)
+        .pipe(catchError(() => of(void 0)))
+        .subscribe(clearLocal);
+      return;
+    }
+
+    clearLocal();
   }
 
-  private buildSession(token: string, user: AuthUser): AuthSession {
-    const isAdmin = user.isAdmin ?? user.perfil?.toLowerCase() === 'admin';
-
+  private buildSession(response: AuthResponse): AuthSession {
     return {
-      token,
-      email: user.email,
-      nome: user.nome,
-      perfil: user.perfil ?? (isAdmin ? 'admin' : ''),
-      isAdmin,
-      roles: user.roles
+      accessToken: response.access_token,
+      refreshToken: response.refresh_token,
+      user: response.user
     };
   }
 
   private setSession(session: AuthSession): void {
-    sessionStorage.setItem(TOKEN_STORAGE_KEY, session.token);
+    sessionStorage.setItem(TOKEN_STORAGE_KEY, session.accessToken);
+    sessionStorage.setItem(REFRESH_STORAGE_KEY, session.refreshToken);
     sessionStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(session));
     clearLegacyLocalStorage();
-    this.tokenState.set(session.token);
+    this.tokenState.set(session.accessToken);
     this.profileState.set(session);
   }
 }

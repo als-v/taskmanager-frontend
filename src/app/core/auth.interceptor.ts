@@ -1,8 +1,7 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, switchMap, throwError } from 'rxjs';
 
 import { environment } from '../../environments/environment';
 import { AuthService } from './auth.service';
@@ -21,15 +20,25 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
     return next(request);
   }
 
+  const isRefreshCall = request.url.startsWith(`${apiUrl}/api/auth/refresh`);
+
   return next(request.clone({ setHeaders: { Authorization: `Bearer ${token}` } })).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (error.status === 401 && auth.isAuthenticated()) {
-        auth.logout();
-        notifications.warning(SESSION_EXPIRED_MESSAGE);
-        router.navigate(['/login']);
+      if (isRefreshCall || error.status !== 401 || !auth.isAuthenticated()) {
+        return throwError(() => error);
       }
 
-      return throwError(() => error);
+      return auth.refreshSession().pipe(
+        switchMap((session) =>
+          next(request.clone({ setHeaders: { Authorization: `Bearer ${session.accessToken}` } }))
+        ),
+        catchError(() => {
+          auth.logout();
+          notifications.warning(SESSION_EXPIRED_MESSAGE);
+          router.navigate(['/login']);
+          return throwError(() => error);
+        })
+      );
     })
   );
 };

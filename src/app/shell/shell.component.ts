@@ -18,7 +18,7 @@ export class ShellComponent {
   readonly theme = inject(ThemeService);
   readonly sidebarCollapsed = signal(false);
   readonly userMenuOpen = signal(false);
-  readonly platformName = 'Task Manager';
+  readonly platformName = 'Elotech';
 
   @HostListener('document:keydown.escape')
   closeOnEscape(): void {

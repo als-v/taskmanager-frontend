@@ -11,9 +11,9 @@
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <label>
         <span>Nome</span>
-        <input type="text" formControlName="nome" autocomplete="name" />
+        <input type="text" formControlName="name" autocomplete="name" />
       </label>
-      <small *ngIf="form.controls.nome.touched && form.controls.nome.invalid">Informe seu nome.</small>
+      <small *ngIf="form.controls.name.touched && form.controls.name.invalid">Informe seu nome.</small>
 
       <label>
         <span>Email</span>
@@ -22,33 +22,16 @@
       <small *ngIf="form.controls.email.touched && form.controls.email.invalid">Informe um email valido.</small>
 
       <label>
-        <span>Telefone</span>
-        <input type="tel" formControlName="telefone" autocomplete="tel" />
+        <span>Senha</span>
+        <input type="password" formControlName="password" autocomplete="new-password" />
       </label>
+      <small *ngIf="form.controls.password.touched && form.controls.password.invalid">A senha deve ter pelo menos 6 caracteres.</small>
 
       <label>
-        <span>Tipo de perfil</span>
-        <select formControlName="perfil_solicitado">
-          <option *ngFor="let perfil of perfis()" [value]="perfil.codigo">{{ perfil.nome }}</option>
-          <option *ngIf="perfis().length === 0" value="membro">Membro</option>
-        </select>
+        <span>Confirmar senha</span>
+        <input type="password" formControlName="confirmPassword" autocomplete="new-password" />
       </label>
-
-      <label>
-        <span>Mensagem</span>
-        <textarea formControlName="mensagem" rows="3"></textarea>
-      </label>
-
-      <label class="captcha-field">
-        <span>{{ captchaQuestion }}</span>
-        <input type="text" formControlName="captchaAnswer" inputmode="numeric" autocomplete="off" />
-      </label>
-      <small *ngIf="form.controls.captchaAnswer.touched && form.controls.captchaAnswer.invalid">Informe a resposta.</small>
-
-      <label class="honeypot" aria-hidden="true">
-        <span>Site</span>
-        <input type="text" formControlName="website" tabindex="-1" autocomplete="off" />
-      </label>
+      <small *ngIf="form.controls.confirmPassword.touched && form.errors?.['passwordMismatch']">As senhas nao coincidem.</small>
 
       <button type="submit" [disabled]="loading()">{{ loading() ? 'Enviando...' : 'Criar conta' }}</button>
     </form>
