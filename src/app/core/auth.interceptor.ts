@@ -8,6 +8,7 @@ import { AuthService } from './auth.service';
 import { NotificationService } from './notification.service';
 
 const SESSION_EXPIRED_MESSAGE = 'Sessao expirada ou invalida. Faca login novamente.';
+const AUTH_ENDPOINTS = ['/api/auth/login', '/api/auth/signup', '/api/auth/refresh', '/api/auth/logout'];
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const auth = inject(AuthService);
@@ -15,16 +16,15 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const notifications = inject(NotificationService);
   const token = auth.token;
   const apiUrl = environment.apiUrl.replace(/\/$/, '');
+  const isAuthEndpoint = AUTH_ENDPOINTS.some((path) => request.url.startsWith(`${apiUrl}${path}`));
 
-  if (!token || !apiUrl || !request.url.startsWith(apiUrl)) {
+  if (!token || !apiUrl || !request.url.startsWith(apiUrl) || isAuthEndpoint) {
     return next(request);
   }
 
-  const isRefreshCall = request.url.startsWith(`${apiUrl}/api/auth/refresh`);
-
   return next(request.clone({ setHeaders: { Authorization: `Bearer ${token}` } })).pipe(
     catchError((error: HttpErrorResponse) => {
-      if (isRefreshCall || error.status !== 401 || !auth.isAuthenticated()) {
+      if (error.status !== 401 || !auth.isAuthenticated()) {
         return throwError(() => error);
       }
 

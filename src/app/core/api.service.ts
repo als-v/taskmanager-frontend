@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -23,6 +23,29 @@ export interface SignUpPayload {
   password: string;
 }
 
+export interface CreateProjectPayload {
+  name: string;
+  description?: string | null;
+}
+
+export interface ProjectResponse {
+  id: string;
+  name: string;
+  description: string | null;
+  owner_id: string;
+  current_user_role: 'ADMIN' | 'MEMBER';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  page: number;
+  size: number;
+  total_elements: number;
+  total_pages: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
@@ -30,6 +53,29 @@ export class ApiService {
 
   login(email: string, password: string): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/api/auth/login`, { email, password });
+  }
+
+  getProjects(
+    page: number,
+    size: number,
+    sort = 'created_at,ASC',
+    name?: string,
+    description?: string
+  ): Observable<PageResponse<ProjectResponse>> {
+    let params = new HttpParams().set('page', String(page)).set('size', String(size)).set('sort', sort);
+
+    if (name?.trim()) {
+      params = params.set('name', name.trim());
+    }
+    if (description?.trim()) {
+      params = params.set('description', description.trim());
+    }
+
+    return this.http.get<PageResponse<ProjectResponse>>(`${this.apiUrl}/api/projects`, { params });
+  }
+
+  createProject(payload: CreateProjectPayload): Observable<ProjectResponse> {
+    return this.http.post<ProjectResponse>(`${this.apiUrl}/api/projects`, payload);
   }
 
   signUp(payload: SignUpPayload): Observable<AuthUser> {

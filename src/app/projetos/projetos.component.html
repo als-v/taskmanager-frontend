@@ -1,0 +1,90 @@
+<section class="projetos" aria-labelledby="projetos-title">
+  <header class="projetos-header">
+    <div>
+      <h1 id="projetos-title">Projetos</h1>
+    </div>
+    <div class="projetos-header-actions">
+      <button class="ghost-button" type="button" (click)="refresh()" [disabled]="loading()">Atualizar</button>
+      <button class="primary-button" type="button" (click)="openCreateModal()">Novo projeto</button>
+    </div>
+  </header>
+
+  <form class="projetos-filters" [formGroup]="filterForm">
+    <label class="field field-inline">
+      <span>Nome</span>
+      <input type="text" formControlName="name" placeholder="Buscar por nome..." autocomplete="off" />
+    </label>
+    <label class="field field-inline">
+      <span>Descrição</span>
+      <input type="text" formControlName="description" placeholder="Buscar por descrição..." autocomplete="off" />
+    </label>
+    <button class="ghost-button" type="button" (click)="clearFilters()" *ngIf="hasActiveFilters()">Limpar filtros</button>
+  </form>
+
+  <div class="projetos-body">
+    <div class="cards" *ngIf="loading() || projects().length; else emptyState">
+      <p class="table-state" *ngIf="loading()">Carregando...</p>
+
+      <ng-container *ngIf="!loading()">
+        <article class="card" *ngFor="let project of projects()">
+          <div class="card-main">
+            <strong class="card-title">{{ project.name }}</strong>
+            <p class="card-description">{{ project.description || 'Sem descricao.' }}</p>
+          </div>
+          <span class="badge" [class.badge-admin]="project.current_user_role === 'ADMIN'" [class.badge-member]="project.current_user_role === 'MEMBER'">
+            {{ project.current_user_role === 'ADMIN' ? 'Admin' : 'Membro' }}
+          </span>
+        </article>
+      </ng-container>
+    </div>
+
+    <ng-template #emptyState>
+      <p class="table-state">Nenhum projeto encontrado.</p>
+    </ng-template>
+  </div>
+
+  <footer class="pagination" *ngIf="totalElements() > 0">
+    <label class="page-size">
+      <span>Itens por pagina</span>
+      <select (change)="onPageSizeChange($any($event.target).value)">
+        <option *ngFor="let option of pageSizeOptions" [value]="option" [selected]="option === pageSize()">{{ option }}</option>
+      </select>
+    </label>
+
+    <span>{{ startItem() }}-{{ endItem() }} de {{ totalElements() }}</span>
+
+    <div>
+      <button type="button" (click)="previousPage()" [disabled]="page() <= 0">Anterior</button>
+      <strong>{{ page() + 1 }} / {{ totalPages() }}</strong>
+      <button type="button" (click)="nextPage()" [disabled]="page() + 1 >= totalPages()">Proxima</button>
+    </div>
+  </footer>
+
+  <app-modal [open]="showCreateModal()" title="Novo projeto" (closed)="closeCreateModal()">
+    <form class="project-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">
+      <label class="field">
+        <span>Nome</span>
+        <input type="text" formControlName="name" maxlength="150" placeholder="Projeto #01" autocomplete="off" />
+        <small class="field-error" *ngIf="createForm.get('name')?.touched && createForm.get('name')?.hasError('required')">
+          Informe o nome do projeto.
+        </small>
+        <small class="field-error" *ngIf="createForm.get('name')?.hasError('maxlength')">
+          O nome deve ter no maximo 150 caracteres.
+        </small>
+      </label>
+
+      <label class="field">
+        <span>Descricao</span>
+        <textarea formControlName="description" maxlength="2000" rows="4" placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit."></textarea>
+        <small class="field-error" *ngIf="createForm.get('description')?.hasError('maxlength')">
+          A descricao deve ter no maximo 2000 caracteres.
+        </small>
+      </label>
+
+      <div class="form-actions">
+        <button class="ghost-button" type="button" (click)="closeCreateModal()" [disabled]="creating()">Cancelar</button>
+        <button class="primary-button" type="submit" [disabled]="creating()">{{ creating() ? 'Criando...' : 'Criar projeto' }}</button>
+      </div>
+    </form>
+  </app-modal>
+</section>
