@@ -1,0 +1,58 @@
+<main class="login-page">
+  <section class="login-panel" aria-labelledby="registro-title">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">TM</span>
+      <div>
+        <p>Task Manager</p>
+        <h1 id="registro-title">Criar conta</h1>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label>
+        <span>Nome</span>
+        <input type="text" formControlName="nome" autocomplete="name" />
+      </label>
+      <small *ngIf="form.controls.nome.touched && form.controls.nome.invalid">Informe seu nome.</small>
+
+      <label>
+        <span>Email</span>
+        <input type="email" formControlName="email" autocomplete="email" />
+      </label>
+      <small *ngIf="form.controls.email.touched && form.controls.email.invalid">Informe um email valido.</small>
+
+      <label>
+        <span>Telefone</span>
+        <input type="tel" formControlName="telefone" autocomplete="tel" />
+      </label>
+
+      <label>
+        <span>Tipo de perfil</span>
+        <select formControlName="perfil_solicitado">
+          <option *ngFor="let perfil of perfis()" [value]="perfil.codigo">{{ perfil.nome }}</option>
+          <option *ngIf="perfis().length === 0" value="membro">Membro</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Mensagem</span>
+        <textarea formControlName="mensagem" rows="3"></textarea>
+      </label>
+
+      <label class="captcha-field">
+        <span>{{ captchaQuestion }}</span>
+        <input type="text" formControlName="captchaAnswer" inputmode="numeric" autocomplete="off" />
+      </label>
+      <small *ngIf="form.controls.captchaAnswer.touched && form.controls.captchaAnswer.invalid">Informe a resposta.</small>
+
+      <label class="honeypot" aria-hidden="true">
+        <span>Site</span>
+        <input type="text" formControlName="website" tabindex="-1" autocomplete="off" />
+      </label>
+
+      <button type="submit" [disabled]="loading()">{{ loading() ? 'Enviando...' : 'Criar conta' }}</button>
+    </form>
+
+    <a class="secondary-link" routerLink="/login">Voltar para login</a>
+  </section>
+</main>

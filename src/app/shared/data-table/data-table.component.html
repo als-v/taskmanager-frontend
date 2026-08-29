@@ -1,0 +1,82 @@
+<section class="table-shell">
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr>
+          <th *ngFor="let column of columns">{{ column.label }}</th>
+          <th class="actions-head" *ngIf="actions.length">Acoes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td class="table-state" [attr.colspan]="columns.length + (actions.length ? 1 : 0)">Carregando...</td>
+        </tr>
+
+        <tr *ngIf="!loading && visibleRows().length === 0" class="fill-row">
+          <td class="table-state" [attr.colspan]="columns.length + (actions.length ? 1 : 0)">{{ emptyMessage }}</td>
+        </tr>
+
+        <tr *ngFor="let row of visibleRows(); let rowIndex = index">
+          <td *ngFor="let column of columns">
+            <ng-container [ngSwitch]="column.type">
+              <span class="status" *ngSwitchCase="'status'" [class.inactive]="!isActiveValue(row, column.key)">
+                <i aria-hidden="true"></i>{{ isActiveValue(row, column.key) ? 'Ativo' : 'Inativo' }}
+              </span>
+              <span class="badge" [class]="badgeClass(row, column.key)" *ngSwitchCase="'badge'">
+                {{ cellValue(row, column.key) }}
+              </span>
+              <select
+                *ngSwitchCase="'select'"
+                class="cell-select"
+                [attr.aria-label]="column.label"
+                [disabled]="!!column.disabled"
+                [value]="selectValue(row, column.key)"
+                (change)="onSelectChange(row, column.key, $any($event.target).value)"
+              >
+                <option *ngIf="column.placeholder" value="">{{ column.placeholder }}</option>
+                <option *ngFor="let opt of (column.options || [])" [value]="opt.value">{{ opt.label }}</option>
+              </select>
+              <span *ngSwitchDefault>{{ cellValue(row, column.key) }}</span>
+            </ng-container>
+          </td>
+
+          <td class="row-actions" *ngIf="actions.length">
+            <button
+              class="action-trigger"
+              type="button"
+              aria-label="Abrir acoes"
+              [attr.aria-expanded]="openMenuRow() === rowIndex"
+              (click)="toggleActions(rowIndex)"
+            >
+              <span aria-hidden="true"></span>
+              <span aria-hidden="true"></span>
+              <span aria-hidden="true"></span>
+            </button>
+            <div class="action-menu" *ngIf="openMenuRow() === rowIndex">
+              <button type="button" *ngFor="let item of actions" [class.danger]="item.tone === 'danger'" (click)="runAction(item, row)">
+                {{ actionLabel(item, row) }}
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="pagination">
+    <label class="page-size">
+      <span>Itens por pagina</span>
+      <select [value]="pageSize" (change)="onPageSizeChange($any($event.target).value)">
+        <option *ngFor="let option of pageSizeOptions" [value]="option">{{ option }}</option>
+      </select>
+    </label>
+
+    <span>{{ startItem() }}-{{ endItem() }} de {{ totalItems() }}</span>
+
+    <div>
+      <button type="button" (click)="previousPage()" [disabled]="currentPage() <= 1">Anterior</button>
+      <strong>{{ currentPage() }} / {{ totalPages() }}</strong>
+      <button type="button" (click)="nextPage()" [disabled]="currentPage() >= totalPages()">Proxima</button>
+    </div>
+  </footer>
+</section>

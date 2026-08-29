@@ -1,0 +1,10 @@
+<section class="toast-stack" aria-live="polite" aria-label="Notificacoes do sistema">
+  <article class="toast" *ngFor="let notification of notifications.notifications()" [class]="'toast ' + notification.type">
+    <span class="toast-icon" aria-hidden="true"></span>
+    <div>
+      <strong>{{ notification.title }}</strong>
+      <p *ngIf="notification.message">{{ notification.message }}</p>
+    </div>
+    <button type="button" aria-label="Fechar notificacao" (click)="notifications.dismiss(notification.id)">x</button>
+  </article>
+</section>

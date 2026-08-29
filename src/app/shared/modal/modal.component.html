@@ -1,0 +1,12 @@
+<section class="modal-backdrop" *ngIf="open" aria-modal="true" role="dialog" [attr.aria-label]="title">
+  <article class="modal-panel">
+    <header class="modal-header">
+      <div>
+        <h2>{{ title }}</h2>
+        <p *ngIf="subtitle">{{ subtitle }}</p>
+      </div>
+      <button class="close-button" type="button" aria-label="Fechar" (click)="close()">x</button>
+    </header>
+    <ng-content />
+  </article>
+</section>

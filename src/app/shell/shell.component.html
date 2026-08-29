@@ -1,0 +1,71 @@
+<div class="layout-shell" [class.sidebar-collapsed]="sidebarCollapsed()">
+  <aside class="sidebar" aria-label="Menu principal">
+    <div class="sidebar-top">
+      <a class="sidebar-brand" routerLink="/" aria-label="Ir para o dashboard">
+        <span class="brand-text">TM</span>
+      </a>
+      <button class="collapse-button" type="button" title="Recolher menu" [attr.aria-expanded]="!sidebarCollapsed()" (click)="toggleSidebar()">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" /></svg>
+      </button>
+    </div>
+
+    <nav class="menu-list">
+      <a class="menu-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" title="Dashboard">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11l8-7 8 7v9H4z" /><path d="M10 20v-6h4v6" /></svg>
+        <span>Dashboard</span>
+      </a>
+      <a class="menu-link" routerLink="/projetos" routerLinkActive="active" title="Projetos">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16" /><path d="M6 20V8l6-4 6 4v12" /><path d="M10 20v-6h4v6" /></svg>
+        <span>Projetos</span>
+      </a>
+      <a class="menu-link" routerLink="/tarefas" routerLinkActive="active" title="Tarefas">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3 8-8" /><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>
+        <span>Tarefas</span>
+      </a>
+      <a class="menu-link" *ngIf="auth.isAdmin()" routerLink="/usuarios" routerLinkActive="active" title="Usuarios">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z" /><path d="M4 21a8 8 0 0 1 16 0" /></svg>
+        <span>Usuarios</span>
+      </a>
+      <a class="menu-link" *ngIf="auth.isAdmin()" routerLink="/admin" routerLinkActive="active" title="Administracao">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z" /><path d="M9 12l2 2 4-4" /></svg>
+        <span>Administracao</span>
+      </a>
+    </nav>
+  </aside>
+
+  <section class="workspace">
+    <header class="topbar">
+      <div class="page-context">
+        <strong>{{ platformName }}</strong>
+        <span>Gerenciamento de tarefas</span>
+      </div>
+
+      <div class="user-area" [class.open]="userMenuOpen()">
+        <div class="user-summary">
+          <strong>{{ auth.session()?.nome || auth.session()?.email || 'Usuario' }}</strong>
+          <span>{{ platformName }}</span>
+        </div>
+        <button class="avatar-button" type="button" aria-label="Abrir menu do usuario" aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen()" (click)="toggleUserMenu()">
+          <span class="avatar" aria-hidden="true">{{ (auth.session()?.nome || auth.session()?.email || 'U').charAt(0).toUpperCase() }}</span>
+          <svg class="user-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 10l4 4 4-4" /></svg>
+        </button>
+
+        <div class="user-dropdown" role="menu" *ngIf="userMenuOpen()">
+          <button class="dropdown-item" type="button" role="menuitem" (click)="toggleTheme()">
+            <svg viewBox="0 0 24 24" aria-hidden="true" *ngIf="!theme.isDark()"><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M3 12h2M19 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" /><circle cx="12" cy="12" r="4" /></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true" *ngIf="theme.isDark()"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+            <span>{{ theme.isDark() ? 'Modo claro' : 'Modo escuro' }}</span>
+          </button>
+          <button class="dropdown-item danger" type="button" role="menuitem" (click)="logout()">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>
+            <span>Sair da plataforma</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="content-panel">
+      <router-outlet />
+    </main>
+  </section>
+</div>

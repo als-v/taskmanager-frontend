@@ -1,0 +1,61 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: #f4f6f8;
+  color: #18212f;
+
+  --app-bg: #f4f6f8;
+  --surface: #ffffff;
+  --surface-muted: #f7fafc;
+  --surface-subtle: #f2f6fa;
+  --border: #d9e0e8;
+  --border-strong: #cfd7e2;
+  --text: #1f2937;
+  --text-muted: #667085;
+  --primary: #247bb5;
+  --primary-soft: #eef7fd;
+  --danger: #b42318;
+  --danger-soft: #fff2f1;
+  --shadow: 0 10px 28px rgba(20, 31, 45, 0.08);
+}
+
+body.theme-dark {
+  color-scheme: dark;
+  background: #080b10;
+  color: #f4f4f5;
+
+  --app-bg: #080b10;
+  --surface: #101318;
+  --surface-muted: #161a21;
+  --surface-subtle: #1d222b;
+  --border: #2a303a;
+  --border-strong: #3a414d;
+  --text: #f4f4f5;
+  --text-muted: #a1a1aa;
+  --primary: #3b9ff3;
+  --primary-soft: #102033;
+  --danger: #ff6b5f;
+  --danger-soft: #2a1111;
+  --shadow: 0 18px 42px rgba(0, 0, 0, 0.42);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background: var(--app-bg);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
