@@ -1,0 +1,16 @@
+<footer class="pagination" *ngIf="totalElements > 0">
+  <label class="page-size">
+    <span>Itens por pagina</span>
+    <select (change)="onPageSizeChange($any($event.target).value)">
+      <option *ngFor="let option of pageSizeOptions" [value]="option" [selected]="option === pageSize">{{ option }}</option>
+    </select>
+  </label>
+
+  <span class="pagination-summary">{{ startItem }}-{{ endItem }} de {{ totalElements }}</span>
+
+  <div class="pagination-nav">
+    <button type="button" (click)="previousPage()" [disabled]="loading || page <= 0">Anterior</button>
+    <strong>{{ page + 1 }} / {{ totalPages }}</strong>
+    <button type="button" (click)="nextPage()" [disabled]="loading || page + 1 >= totalPages">Proxima</button>
+  </div>
+</footer>

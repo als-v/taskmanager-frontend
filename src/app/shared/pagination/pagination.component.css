@@ -1,0 +1,133 @@
+:host {
+  display: block;
+  min-width: 0;
+  container-type: inline-size;
+  container-name: app-pagination;
+}
+
+.pagination {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  min-width: 0;
+  min-height: 56px;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 16px;
+  color: var(--text-muted);
+  background: var(--surface-muted);
+  font-size: 13px;
+}
+
+.pagination-summary {
+  overflow: hidden;
+  flex: 1 1 auto;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pagination-nav {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.pagination-nav button {
+  min-height: 34px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 0 12px;
+  color: var(--text);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.pagination-nav button:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.pagination-nav button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.pagination-nav strong {
+  color: var(--text);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.page-size {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.page-size select {
+  min-height: 32px;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  padding: 4px 26px 4px 8px;
+  color: var(--text);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.page-size select:focus-visible {
+  border-color: var(--primary);
+  outline: 2px solid color-mix(in srgb, var(--primary) 18%, transparent);
+  outline-offset: 1px;
+}
+
+/* Narrow hosts (kanban columns, side panels) get a fully stacked layout instead
+   of relying on viewport width, since the container can be narrow on any screen size. */
+@container app-pagination (max-width: 360px) {
+  .pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pagination-summary {
+    white-space: normal;
+    text-align: center;
+  }
+
+  .page-size {
+    justify-content: space-between;
+  }
+
+  .pagination-nav {
+    justify-content: space-between;
+  }
+
+  .pagination-nav button {
+    flex: 1 1 auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .pagination {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .page-size {
+    justify-content: space-between;
+  }
+}

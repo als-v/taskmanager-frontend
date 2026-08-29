@@ -1,6 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
 
+import { PaginationComponent } from '../pagination/pagination.component';
+
 export interface DataTableSelectOption {
   value: string;
   label: string;
@@ -36,7 +38,7 @@ export interface TableSelectEvent<T extends Record<string, unknown> = Record<str
 @Component({
   selector: 'app-data-table',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PaginationComponent],
   templateUrl: './data-table.component.html',
   styleUrl: './data-table.component.css'
 })
@@ -46,7 +48,6 @@ export class DataTableComponent {
 
   readonly page = signal(1);
   readonly openMenuRow = signal<number | null>(null);
-  readonly pageSizeOptions = [10, 25, 50, 100];
 
   @Input({ required: true })
   set rows(value: Record<string, unknown>[]) {
@@ -130,22 +131,10 @@ export class DataTableComponent {
     this.selectChange.emit({ key, value, row });
   }
 
-  onPageSizeChange(value: string): void {
-    this._pageSize.set(clampPageSize(Number(value)));
+  onPaginationPageSizeChange(size: number): void {
+    this._pageSize.set(clampPageSize(size));
     this.page.set(1);
     this.openMenuRow.set(null);
-  }
-
-  previousPage(): void {
-    if (this.page() > 1) {
-      this.page.update((p) => p - 1);
-    }
-  }
-
-  nextPage(): void {
-    if (this.page() < this.totalPages()) {
-      this.page.update((p) => p + 1);
-    }
   }
 }
 

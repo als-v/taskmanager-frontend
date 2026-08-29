@@ -33,7 +33,7 @@
           <strong>{{ auth.session()?.user?.name || auth.session()?.user?.email || 'Usuario' }}</strong>
         </div>
         <button class="avatar-button" type="button" aria-label="Abrir menu do usuario" aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen()" (click)="toggleUserMenu()">
-          <span class="avatar" aria-hidden="true">{{ (auth.session()?.user?.name || auth.session()?.user?.email || 'U').charAt(0).toUpperCase() }}</span>
+          <app-avatar [name]="auth.session()?.user?.name || auth.session()?.user?.email || 'Usuario'" />
           <svg class="user-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 10l4 4 4-4" /></svg>
         </button>
 

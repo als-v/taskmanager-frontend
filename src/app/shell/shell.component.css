@@ -217,25 +217,6 @@
   outline: none;
 }
 
-.avatar-button:hover .avatar,
-.user-area.open .avatar {
-  transform: translateY(-1px);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
-}
-
-.avatar {
-  display: grid;
-  width: 34px;
-  height: 34px;
-  place-items: center;
-  border-radius: 999px;
-  color: #ffffff;
-  background: var(--primary);
-  font-size: 14px;
-  font-weight: 850;
-  transition: transform 140ms ease, box-shadow 140ms ease;
-}
-
 .user-caret {
   width: 15px;
   height: 15px;

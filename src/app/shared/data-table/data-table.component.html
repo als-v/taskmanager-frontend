@@ -63,20 +63,12 @@
     </table>
   </div>
 
-  <footer class="pagination">
-    <label class="page-size">
-      <span>Itens por pagina</span>
-      <select [value]="pageSize" (change)="onPageSizeChange($any($event.target).value)">
-        <option *ngFor="let option of pageSizeOptions" [value]="option">{{ option }}</option>
-      </select>
-    </label>
-
-    <span>{{ startItem() }}-{{ endItem() }} de {{ totalItems() }}</span>
-
-    <div>
-      <button type="button" (click)="previousPage()" [disabled]="currentPage() <= 1">Anterior</button>
-      <strong>{{ currentPage() }} / {{ totalPages() }}</strong>
-      <button type="button" (click)="nextPage()" [disabled]="currentPage() >= totalPages()">Proxima</button>
-    </div>
-  </footer>
+  <app-pagination
+    [page]="currentPage() - 1"
+    [pageSize]="pageSize"
+    [totalElements]="totalItems()"
+    [totalPages]="totalPages()"
+    (pageChange)="page.set($event + 1)"
+    (pageSizeChange)="onPaginationPageSizeChange($event)"
+  />
 </section>
