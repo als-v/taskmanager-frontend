@@ -15,19 +15,54 @@
   overflow-y: auto;
 }
 
-.dashboard-header h1 {
+.dashboard-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 1em;
+}
+
+.dashboard-header-title h1 {
   margin: 0 0 6px;
   color: var(--text);
   font-size: 24px;
   font-weight: 850;
 }
 
-.dashboard-header p {
+.dashboard-header-title p {
   margin: 0;
   max-width: 720px;
   color: var(--text-muted);
   font-size: 14px;
   line-height: 1.5;
+}
+
+.ghost-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  min-height: 36px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 0 14px;
+  color: var(--text);
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.ghost-button:hover {
+  background: var(--surface-muted);
+}
+
+.table-state {
+  margin: 0;
+  padding: 16px 0;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
 }
 
 .cards {
@@ -44,6 +79,15 @@
   background: var(--surface);
   padding: 20px;
   box-shadow: var(--shadow);
+}
+
+.card-alert {
+  border-color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.card-alert .card-value {
+  color: var(--danger);
 }
 
 .card-label {
@@ -65,4 +109,185 @@
   color: var(--text-muted);
   font-size: 13px;
   line-height: 1.45;
+}
+
+.breakdown-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.breakdown-list {
+  display: grid;
+  gap: 10px;
+}
+
+.breakdown-row {
+  display: grid;
+  grid-template-columns: 96px 1fr 32px;
+  align-items: center;
+  gap: 10px;
+}
+
+.breakdown-label {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.breakdown-total {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 800;
+  text-align: right;
+}
+
+.breakdown-bar-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-muted);
+}
+
+.breakdown-bar {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+
+.status-todo {
+  background: #64748b;
+}
+
+.status-in_progress {
+  background: #1d4ed8;
+}
+
+.status-done {
+  background: #15803d;
+}
+
+.priority-low {
+  background: #64748b;
+}
+
+.priority-medium {
+  background: #1d4ed8;
+}
+
+.priority-high {
+  background: #b45309;
+}
+
+.priority-critical {
+  background: var(--danger);
+}
+
+.wip-list {
+  display: grid;
+  gap: 10px;
+}
+
+.wip-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.wip-name {
+  overflow: hidden;
+  flex: 1 1 auto;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.badge-wip {
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.empty-state {
+  margin: 0;
+  padding: 8px 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.empty-state a {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.projects-section {
+  display: grid;
+  gap: 12px;
+}
+
+.section-title {
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.project-tile {
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.project-tile:hover {
+  transform: translateY(-1px);
+}
+
+.project-tile.selected {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.project-tile-name {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-tile-link {
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  justify-self: start;
+}
+
+.project-tile-link:hover {
+  text-decoration: underline;
 }

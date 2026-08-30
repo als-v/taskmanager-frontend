@@ -1,5 +1,81 @@
 <section class="dashboard" aria-labelledby="dashboard-title">
   <header class="dashboard-header">
-    <h1 id="dashboard-title">Dashboard</h1>
+    <div class="dashboard-header-title">
+      <h1 id="dashboard-title">{{ selectedProject() ? 'Dashboard — ' + selectedProject()!.name : 'Dashboard' }}</h1>
+    </div>
+    <button class="ghost-button" type="button" *ngIf="selectedProject()" (click)="clearProject()">Visao geral</button>
   </header>
+
+  <p class="table-state" *ngIf="loading() && !dashboard()">Carregando...</p>
+
+  <ng-container *ngIf="dashboard() as data">
+    <div class="cards">
+      <div class="card" *ngFor="let card of statCards()" [class.card-alert]="card.alerta">
+        <span class="card-label">{{ card.titulo }}</span>
+        <span class="card-value">{{ card.valor }}</span>
+      </div>
+    </div>
+
+    <div class="breakdown-grid">
+      <div class="card">
+        <span class="card-label">Tarefas por status</span>
+        <div class="breakdown-list">
+          <div class="breakdown-row" *ngFor="let row of statusBreakdown()">
+            <span class="breakdown-label">{{ row.label }}</span>
+            <div class="breakdown-bar-track">
+              <div class="breakdown-bar" [class]="'status-' + row.key.toLowerCase()" [style.width.%]="row.percent"></div>
+            </div>
+            <span class="breakdown-total">{{ row.total }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="card-label">Tarefas por prioridade</span>
+        <div class="breakdown-list">
+          <div class="breakdown-row" *ngFor="let row of priorityBreakdown()">
+            <span class="breakdown-label">{{ row.label }}</span>
+            <div class="breakdown-bar-track">
+              <div class="breakdown-bar" [class]="'priority-' + row.key.toLowerCase()" [style.width.%]="row.percent"></div>
+            </div>
+            <span class="breakdown-total">{{ row.total }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="card-label">Responsaveis com tarefas em andamento</span>
+      <div class="wip-list" *ngIf="sortedWip().length; else emptyWip">
+        <div class="wip-row" *ngFor="let item of sortedWip()">
+          <app-avatar [name]="item.name" size="sm" />
+          <span class="wip-name">{{ item.name }}</span>
+          <span class="badge badge-wip">{{ item.in_progress }}</span>
+        </div>
+      </div>
+      <ng-template #emptyWip>
+        <p class="empty-state">Nenhuma tarefa em andamento no escopo selecionado.</p>
+      </ng-template>
+    </div>
+
+    <div class="projects-section">
+      <span class="section-title">Seus projetos</span>
+      <div class="project-grid" *ngIf="data.projects.length; else emptyProjects">
+        <div
+          class="project-tile"
+          *ngFor="let project of data.projects"
+          [class.selected]="selectedProjectId() === project.id"
+          (click)="selectProject(project.id)"
+        >
+          <span class="project-tile-name">{{ project.name }}</span>
+          <a class="project-tile-link" [routerLink]="['/projetos', project.id]" (click)="$event.stopPropagation()">Abrir quadro →</a>
+        </div>
+      </div>
+      <ng-template #emptyProjects>
+        <p class="empty-state">
+          Voce ainda nao participa de nenhum projeto. <a routerLink="/projetos">Ver projetos</a>
+        </p>
+      </ng-template>
+    </div>
+  </ng-container>
 </section>

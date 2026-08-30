@@ -119,6 +119,36 @@ export interface AuditLogResponse {
   created_at: string;
 }
 
+export interface DashboardProjectResponse {
+  id: string;
+  name: string;
+}
+
+export interface DashboardResponse {
+  projects_total: number;
+  tasks_total: number;
+  by_status: Record<TaskStatus, number>;
+  by_priority: Record<TaskPriority, number>;
+  overdue: number;
+  due_soon: number;
+  projects: DashboardProjectResponse[];
+  selected_project_id: string | null;
+  generated_at: string;
+}
+
+export interface DashboardWipItemResponse {
+  user_id: string;
+  name: string;
+  email: string;
+  in_progress: number;
+}
+
+export interface DashboardWipResponse {
+  items: DashboardWipItemResponse[];
+  selected_project_id: string | null;
+  generated_at: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
@@ -246,6 +276,24 @@ export class ApiService {
     }
 
     return this.http.get<PageResponse<AuditLogResponse>>(`${this.apiUrl}/api/projects/${projectId}/logs`, { params });
+  }
+
+  getDashboard(projectId?: string): Observable<DashboardResponse> {
+    let params = new HttpParams();
+    if (projectId) {
+      params = params.set('project_id', projectId);
+    }
+
+    return this.http.get<DashboardResponse>(`${this.apiUrl}/api/dashboard`, { params });
+  }
+
+  getDashboardWip(projectId?: string): Observable<DashboardWipResponse> {
+    let params = new HttpParams();
+    if (projectId) {
+      params = params.set('project_id', projectId);
+    }
+
+    return this.http.get<DashboardWipResponse>(`${this.apiUrl}/api/dashboard/wip`, { params });
   }
 
   signUp(payload: SignUpPayload): Observable<AuthUser> {
