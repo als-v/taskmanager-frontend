@@ -6,7 +6,9 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "test": "ng test"
+    "test": "ng test",
+    "test:coverage": "ng test --watch=false --code-coverage",
+    "sonar": "docker run --rm --add-host=host.docker.internal:host-gateway -e SONAR_HOST_URL=${SONAR_HOST_URL:-http://host.docker.internal:9000} -e SONAR_TOKEN -v \"$PWD:/usr/src\" sonarsource/sonar-scanner-cli"
   },
   "dependencies": {
     "@angular/animations": "^21.0.0",
