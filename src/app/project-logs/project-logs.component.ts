@@ -7,6 +7,7 @@ import { debounceTime, finalize } from 'rxjs';
 import {
   ApiService,
   AuditAction,
+  AuditLogReferenceResponse,
   AuditLogResponse,
   ProjectMemberResponse,
   ProjectResponse,
@@ -86,25 +87,31 @@ export class ProjectLogsComponent implements OnInit {
 
   readonly filterForm = this.fb.nonNullable.group({
     actorId: [''],
-    action: ['']
+    action: [''],
+    dateFrom: [''],
+    dateTo: ['']
   });
 
   readonly hasActiveFilters = computed(() => {
-    const { actorId, action } = this.filterForm.getRawValue();
-    return Boolean(actorId || action);
+    const { actorId, action, dateFrom, dateTo } = this.filterForm.getRawValue();
+    return Boolean(actorId || action || dateFrom || dateTo);
   });
 
   private actorIdFilter = '';
   private actionFilter: AuditAction | '' = '';
+  private dateFromFilter = '';
+  private dateToFilter = '';
 
   ngOnInit(): void {
     this.loadProject();
     this.loadMembers(true);
     this.load();
 
-    this.filterForm.valueChanges.pipe(debounceTime(300)).subscribe(({ actorId, action }) => {
+    this.filterForm.valueChanges.pipe(debounceTime(300)).subscribe(({ actorId, action, dateFrom, dateTo }) => {
       this.actorIdFilter = actorId ?? '';
       this.actionFilter = (action as AuditAction) ?? '';
+      this.dateFromFilter = dateFrom ?? '';
+      this.dateToFilter = dateTo ?? '';
       this.selectedActorId.set(actorId ?? '');
       this.page.set(0);
       this.load();
@@ -115,8 +122,12 @@ export class ProjectLogsComponent implements OnInit {
     void this.router.navigate(['/projetos', this.projectId]);
   }
 
+  refresh(): void {
+    this.load();
+  }
+
   clearFilters(): void {
-    this.filterForm.reset({ actorId: '', action: '' });
+    this.filterForm.reset({ actorId: '', action: '', dateFrom: '', dateTo: '' });
     this.selectedActorId.set('');
   }
 
@@ -167,13 +178,12 @@ export class ProjectLogsComponent implements OnInit {
     return status ? STATUS_LABELS[status] : '-';
   }
 
-  actorName(actorId: string): string {
-    const member = this.members().find((candidate) => candidate.user_id === actorId);
-    return member?.name ?? `Usuario #${actorId.slice(0, 8)}`;
+  actorRowLabel(actor: AuditLogReferenceResponse): string {
+    return actor.name ?? `Usuario #${actor.id.slice(0, 8)}`;
   }
 
-  taskLabel(taskId: string): string {
-    return `Tarefa #${taskId.slice(0, 8)}`;
+  taskRowLabel(task: AuditLogReferenceResponse): string {
+    return task.name ?? `Tarefa #${task.id.slice(0, 8)}`;
   }
 
   private loadProject(): void {
@@ -213,8 +223,19 @@ export class ProjectLogsComponent implements OnInit {
   private load(): void {
     this.loading.set(true);
 
+    const createdAtFrom = this.dateFromFilter ? `${this.dateFromFilter}T00:00:00` : undefined;
+    const createdAtTo = this.dateToFilter ? `${this.dateToFilter}T23:59:59` : undefined;
+
     this.api
-      .getAuditLogs(this.projectId, this.page(), this.pageSize(), this.actorIdFilter || undefined, this.actionFilter || undefined)
+      .getAuditLogs(
+        this.projectId,
+        this.page(),
+        this.pageSize(),
+        this.actorIdFilter || undefined,
+        this.actionFilter || undefined,
+        createdAtFrom,
+        createdAtTo
+      )
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({
         next: (response) => {

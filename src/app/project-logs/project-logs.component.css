@@ -19,6 +19,8 @@
 .project-logs-header {
   display: flex;
   flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .project-logs-header-title {
@@ -53,7 +55,8 @@
   font-weight: 750;
 }
 
-.field select {
+.field select,
+.field input {
   min-height: 40px;
   border: 1px solid var(--border-strong);
   border-radius: 8px;
@@ -241,6 +244,11 @@
 
 .ghost-button:hover:not(:disabled) {
   background: var(--surface-muted);
+}
+
+.ghost-button:disabled {
+  opacity: 0.5;
+  cursor: default;
 }
 
 .icon-button {

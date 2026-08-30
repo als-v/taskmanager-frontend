@@ -118,11 +118,16 @@ export type AuditAction =
   | 'DUE_DATE_CHANGED'
   | 'TASK_DELETED';
 
+export interface AuditLogReferenceResponse {
+  id: string;
+  name: string | null;
+}
+
 export interface AuditLogResponse {
   id: string;
   project_id: string;
-  task_id: string;
-  actor_id: string;
+  task: AuditLogReferenceResponse;
+  actor: AuditLogReferenceResponse;
   action: AuditAction;
   from_status: TaskStatus | null;
   to_status: TaskStatus | null;
@@ -296,7 +301,9 @@ export class ApiService {
     page: number,
     size: number,
     actorId?: string,
-    action?: AuditAction
+    action?: AuditAction,
+    createdAtFrom?: string,
+    createdAtTo?: string
   ): Observable<PageResponse<AuditLogResponse>> {
     let params = new HttpParams().set('page', String(page)).set('size', String(size));
 
@@ -305,6 +312,12 @@ export class ApiService {
     }
     if (action) {
       params = params.set('action', action);
+    }
+    if (createdAtFrom) {
+      params = params.set('created_at_from', createdAtFrom);
+    }
+    if (createdAtTo) {
+      params = params.set('created_at_to', createdAtTo);
     }
 
     return this.http.get<PageResponse<AuditLogResponse>>(`${this.apiUrl}/api/projects/${projectId}/logs`, { params });

@@ -4,6 +4,16 @@
       <button class="ghost-button icon-button" type="button" (click)="goBack()" aria-label="Voltar para o projeto">←</button>
       <h1 id="project-logs-title">Logs — {{ project()?.name || 'Projeto' }}</h1>
     </div>
+    <button
+      class="ghost-button icon-button"
+      type="button"
+      (click)="refresh()"
+      [disabled]="loading()"
+      aria-label="Atualizar logs"
+      title="Atualizar"
+    >
+      ⟳
+    </button>
   </header>
 
   <form class="project-logs-filters" [formGroup]="filterForm">
@@ -58,6 +68,16 @@
       </select>
     </label>
 
+    <label class="field field-inline">
+      <span>De</span>
+      <input type="date" formControlName="dateFrom" />
+    </label>
+
+    <label class="field field-inline">
+      <span>Até</span>
+      <input type="date" formControlName="dateTo" />
+    </label>
+
     <button class="ghost-button" type="button" (click)="clearFilters()" *ngIf="hasActiveFilters()">Limpar filtros</button>
   </form>
 
@@ -80,8 +100,8 @@
         <ng-container *ngIf="!loading()">
           <tr *ngFor="let log of logs()">
             <td>{{ log.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
-            <td>{{ actorName(log.actor_id) }}</td>
-            <td>{{ taskLabel(log.task_id) }}</td>
+            <td>{{ actorRowLabel(log.actor) }}</td>
+            <td>{{ taskRowLabel(log.task) }}</td>
             <td><span class="badge badge-action">{{ actionLabel(log.action) }}</span></td>
             <td>
               <ng-container *ngIf="log.action === 'STATUS_CHANGED'; else genericDetail">
