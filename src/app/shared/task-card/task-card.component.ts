@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 import { TaskResponse } from '../../core/api.service';
 import { AvatarComponent } from '../avatar/avatar.component';
@@ -14,6 +14,7 @@ import { AvatarComponent } from '../avatar/avatar.component';
 })
 export class TaskCardComponent {
   @Input({ required: true }) task!: TaskResponse;
+  @Output() open = new EventEmitter<void>();
 
   readonly priorityLabels: Record<string, string> = {
     LOW: 'Baixa',

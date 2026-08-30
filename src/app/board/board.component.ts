@@ -64,7 +64,7 @@ export class BoardComponent implements OnInit {
   ];
 
   readonly taskFilterForm = this.fb.nonNullable.group({
-    title: [''],
+    q: [''],
     status: [''],
     assigneeId: [''],
     priority: [''],
@@ -76,7 +76,7 @@ export class BoardComponent implements OnInit {
 
   readonly hasActiveTaskFilters = computed(() => {
     const filters = this.taskFilterValues();
-    return Boolean(filters.title || filters.status || filters.assigneeId || filters.priority || filters.dueDate || filters.sort !== DEFAULT_TASK_SORT);
+    return Boolean(filters.q || filters.status || filters.assigneeId || filters.priority || filters.dueDate || filters.sort !== DEFAULT_TASK_SORT);
   });
 
   readonly visibleColumns = computed(() => {
@@ -88,8 +88,8 @@ export class BoardComponent implements OnInit {
     const filters = this.taskFilterValues();
     const result: TaskFilterOptions = {};
 
-    if (filters.title.trim()) {
-      result.title = filters.title.trim();
+    if (filters.q.trim()) {
+      result.q = filters.q.trim();
     }
     if (filters.priority) {
       result.priority = filters.priority as TaskPriority;
@@ -183,7 +183,7 @@ export class BoardComponent implements OnInit {
 
   clearTaskFilters(): void {
     this.taskFilterForm.reset({
-      title: '',
+      q: '',
       status: '',
       assigneeId: '',
       priority: '',

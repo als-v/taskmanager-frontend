@@ -12,7 +12,7 @@
     <p class="table-state" *ngIf="loading()">Carregando...</p>
 
     <ng-container *ngIf="!loading()">
-      <app-task-card *ngFor="let task of tasks()" [task]="task" />
+      <app-task-card *ngFor="let task of tasks()" [task]="task" (open)="openDetailModal(task)" />
       <p class="table-state" *ngIf="tasks().length === 0">Nenhuma tarefa.</p>
       <p class="load-more-state" *ngIf="loadingMore()">Carregando mais...</p>
     </ng-container>
@@ -67,5 +67,185 @@
         <button class="primary-button" type="submit" [disabled]="creating()">{{ creating() ? 'Criando...' : 'Criar tarefa' }}</button>
       </div>
     </form>
+  </app-modal>
+
+  <app-modal [open]="showDetailModal()" title="Detalhes da tarefa" (closed)="closeDetailModal()">
+    <div class="task-detail" *ngIf="selectedTask() as task">
+      <div class="task-detail-top">
+        <div class="popover" [class.open]="statusMenuOpen()">
+          <button
+            class="chip-button status-chip"
+            type="button"
+            [disabled]="savingField() === 'status'"
+            aria-haspopup="listbox"
+            [attr.aria-expanded]="statusMenuOpen()"
+            (click)="toggleStatusMenu()"
+          >
+            {{ statusLabel(task.status) }}
+          </button>
+
+          <div class="popover-menu" role="listbox" *ngIf="statusMenuOpen()">
+            <button
+              class="popover-option"
+              type="button"
+              role="option"
+              *ngFor="let option of statusOptions"
+              [class.selected]="option.value === task.status"
+              (click)="selectStatus(option.value)"
+            >
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+
+        <span class="field-saving" *ngIf="savingField() === 'status'">Salvando...</span>
+      </div>
+
+      <div class="task-detail-title">
+        <input
+          *ngIf="editingTitle(); else titleText"
+          #titleInput
+          type="text"
+          class="task-title-input"
+          maxlength="200"
+          [value]="titleDraft()"
+          (input)="titleDraft.set(titleInput.value)"
+          (blur)="saveTitle()"
+          (keydown.enter)="titleInput.blur()"
+          (keydown.escape)="cancelEditTitle()"
+        />
+        <ng-template #titleText>
+          <h3 class="task-title-display" tabindex="0" role="button" (click)="startEditTitle()" (keydown.enter)="startEditTitle()">
+            {{ task.title }}
+          </h3>
+        </ng-template>
+        <span class="field-saving" *ngIf="savingField() === 'title'">Salvando...</span>
+      </div>
+
+      <div class="task-detail-chips">
+        <div class="popover" [class.open]="priorityMenuOpen()">
+          <button
+            [class]="'chip-button priority-chip priority-' + task.priority.toLowerCase()"
+            type="button"
+            [disabled]="savingField() === 'priority'"
+            aria-haspopup="listbox"
+            [attr.aria-expanded]="priorityMenuOpen()"
+            (click)="togglePriorityMenu()"
+          >
+            {{ priorityLabels[task.priority] || task.priority }}
+          </button>
+
+          <div class="popover-menu" role="listbox" *ngIf="priorityMenuOpen()">
+            <button
+              class="popover-option"
+              type="button"
+              role="option"
+              *ngFor="let option of priorityOptions"
+              [class.selected]="option.value === task.priority"
+              (click)="selectPriority(option.value)"
+            >
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+
+        <div class="popover" [class.open]="assigneeMenuOpen()">
+          <ng-container *ngIf="task.assignee; else joinChip">
+            <button
+              class="chip-button assignee-chip"
+              type="button"
+              [disabled]="savingField() === 'assignee'"
+              aria-haspopup="listbox"
+              [attr.aria-expanded]="assigneeMenuOpen()"
+              (click)="toggleAssigneeMenu()"
+            >
+              <app-avatar [name]="task.assignee.name" size="sm" />
+              <span>{{ task.assignee.name }}</span>
+            </button>
+          </ng-container>
+          <ng-template #joinChip>
+            <button
+              class="chip-button assignee-chip assignee-chip-empty"
+              type="button"
+              [disabled]="savingField() === 'assignee'"
+              (click)="joinTask()"
+            >
+              + Entrar na task
+            </button>
+          </ng-template>
+
+          <div class="popover-menu" role="listbox" *ngIf="assigneeMenuOpen()">
+            <button class="popover-option" type="button" role="option" (click)="joinTask()">Entrar na task (atribuir a mim)</button>
+            <button class="popover-option" type="button" role="option" *ngIf="task.assignee" (click)="selectAssignee(null)">
+              Remover responsavel
+            </button>
+            <button
+              class="popover-option"
+              type="button"
+              role="option"
+              *ngFor="let member of members"
+              [class.selected]="task.assignee?.id === member.user_id"
+              (click)="selectAssignee(member.user_id)"
+            >
+              {{ member.name }}
+            </button>
+          </div>
+        </div>
+
+        <div class="popover" [class.open]="editingDueDate()">
+          <button
+            class="chip-button due-date-chip"
+            type="button"
+            *ngIf="!editingDueDate()"
+            [class.due-date-chip-overdue]="isOverdue(task)"
+            [disabled]="savingField() === 'dueDate'"
+            (click)="startEditDueDate()"
+          >
+            {{ task.due_date ? ('Prazo: ' + (task.due_date | date: 'dd/MM/yyyy')) : '+ Adicionar prazo' }}
+          </button>
+
+          <div class="due-date-editor" *ngIf="editingDueDate()">
+            <input #dueDateInput type="date" [value]="dueDateDraft()" (change)="saveDueDate(dueDateInput.value)" />
+            <button class="link-button" type="button" *ngIf="task.due_date" (click)="clearDueDate()">Remover</button>
+            <button class="link-button" type="button" (click)="cancelEditDueDate()">Cancelar</button>
+          </div>
+        </div>
+
+        <span class="field-saving" *ngIf="savingField() === 'dueDate'">Salvando...</span>
+      </div>
+
+      <div class="task-detail-description">
+        <div class="description-header">
+          <strong>Descricao</strong>
+          <button class="link-button" type="button" *ngIf="!editingDescription()" (click)="startEditDescription()">Editar</button>
+        </div>
+
+        <ng-container *ngIf="!editingDescription(); else descriptionEditor">
+          <p class="description-text" *ngIf="task.description; else descriptionEmpty">{{ task.description }}</p>
+          <ng-template #descriptionEmpty>
+            <p class="description-text description-placeholder">Adicionar uma descricao mais detalhada...</p>
+          </ng-template>
+        </ng-container>
+
+        <ng-template #descriptionEditor>
+          <textarea
+            #descriptionInput
+            class="description-textarea"
+            rows="4"
+            maxlength="2000"
+            [value]="descriptionDraft()"
+            (input)="descriptionDraft.set(descriptionInput.value)"
+          ></textarea>
+          <div class="form-actions">
+            <button class="ghost-button" type="button" [disabled]="savingField() === 'description'" (click)="cancelEditDescription()">
+              Cancelar
+            </button>
+            <button class="primary-button" type="button" [disabled]="savingField() === 'description'" (click)="saveDescription()">
+              {{ savingField() === 'description' ? 'Salvando...' : 'Salvar' }}
+            </button>
+          </div>
+        </ng-template>
+      </div>
+    </div>
   </app-modal>
 </section>

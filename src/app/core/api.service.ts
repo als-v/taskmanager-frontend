@@ -91,8 +91,17 @@ export interface CreateTaskPayload {
   due_date?: string | null;
 }
 
-export interface TaskFilterOptions {
+export interface UpdateTaskPayload {
   title?: string;
+  description?: string | null;
+  status?: TaskStatus;
+  priority?: TaskPriority;
+  assignee_id?: string | null;
+  due_date?: string | null;
+}
+
+export interface TaskFilterOptions {
+  q?: string;
   priority?: TaskPriority;
   assigneeId?: string;
   unassigned?: boolean;
@@ -235,8 +244,8 @@ export class ApiService {
   ): Observable<PageResponse<TaskResponse>> {
     let params = new HttpParams().set('status', opts.status).set('page', String(opts.page)).set('size', String(opts.size));
 
-    if (opts.title?.trim()) {
-      params = params.set('title', opts.title.trim());
+    if (opts.q?.trim()) {
+      params = params.set('q', opts.q.trim());
     }
 
     if (opts.priority) {
@@ -262,6 +271,10 @@ export class ApiService {
 
   createTask(projectId: string, payload: CreateTaskPayload): Observable<TaskResponse> {
     return this.http.post<TaskResponse>(`${this.apiUrl}/api/projects/${projectId}/tasks`, payload);
+  }
+
+  updateTask(projectId: string, taskId: string, payload: UpdateTaskPayload): Observable<TaskResponse> {
+    return this.http.patch<TaskResponse>(`${this.apiUrl}/api/projects/${projectId}/tasks/${taskId}`, payload);
   }
 
   getAuditLogs(

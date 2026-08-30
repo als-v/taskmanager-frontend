@@ -10,11 +10,18 @@
   border-radius: 10px;
   background: var(--surface);
   padding: 12px 14px;
+  cursor: pointer;
   transition: border-color 0.15s ease;
 }
 
-.task-card:hover {
+.task-card:hover,
+.task-card:focus-visible {
   border-color: var(--border-strong);
+}
+
+.task-card:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--primary) 18%, transparent);
+  outline-offset: 1px;
 }
 
 .task-card-overdue {
@@ -115,34 +122,7 @@
   font-weight: 700;
 }
 
-.due-date svg {
-  width: 14px;
-  height: 14px;
-  flex: 0 0 auto;
-  fill: none;
-  stroke: currentColor;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 2;
-}
-
 .due-date-overdue {
   color: var(--danger);
   font-weight: 800;
-}
-
-.overdue-label {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  margin-left: 2px;
-  padding: 2px 9px;
-  border-radius: 999px;
-  color: #fff;
-  background: var(--danger);
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  white-space: nowrap;
 }
