@@ -5,10 +5,6 @@ import { ApiService, NotificationResponse, NotificationType, PageResponse } from
 import { getHttpErrorMessage } from './http-error-message';
 import { NotificationService } from './notification.service';
 
-// Nome propositalmente diferente de `NotificationService` (o toast/snackbar generico usado em todo o
-// app) para nao confundir os dois conceitos: este servico busca as notificacoes reais do backend
-// (tarefa atribuida, membro adicionado a projeto, etc.) e usa o toast apenas como um dos canais de
-// aviso.
 const POLL_INTERVAL_MS = 60_000;
 const PAGE_SIZE = 50;
 
@@ -72,8 +68,6 @@ export class NotificationInboxService {
 
     const currentIds = new Set(response.content.map((item) => item.id));
 
-    // Na primeira resposta apenas registra o que ja existia (nao lido de antes do login) sem
-    // disparar toast - so notificacoes que chegarem depois desse ponto sao "novas" de fato.
     if (!this.baselineDone) {
       this.seenIds = currentIds;
       this.baselineDone = true;

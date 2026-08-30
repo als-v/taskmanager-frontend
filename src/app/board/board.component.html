@@ -132,7 +132,7 @@
       </button>
     </aside>
 
-    <div class="columns">
+    <div class="columns" cdkDropListGroup>
       <app-task-column
         *ngFor="let column of visibleColumns()"
         [projectId]="projectId"

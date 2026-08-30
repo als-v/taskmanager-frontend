@@ -1,5 +1,18 @@
+import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
-import { Component, HostListener, Input, OnChanges, OnInit, SimpleChanges, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  HostListener,
+  Input,
+  OnChanges,
+  OnInit,
+  SimpleChanges,
+  computed,
+  inject,
+  signal
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 
@@ -15,6 +28,7 @@ import {
 import { AuthService } from '../../core/auth.service';
 import { getHttpErrorMessage } from '../../core/http-error-message';
 import { NotificationService } from '../../core/notification.service';
+import { TaskBoardSyncService } from '../../board/task-board-sync.service';
 import { AvatarComponent } from '../avatar/avatar.component';
 import { ModalComponent } from '../modal/modal.component';
 import { TaskCardComponent } from '../task-card/task-card.component';
@@ -27,7 +41,7 @@ type DetailField = 'title' | 'description' | 'status' | 'priority' | 'assignee' 
 @Component({
   selector: 'app-task-column',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AvatarComponent, ModalComponent, TaskCardComponent],
+  imports: [CommonModule, ReactiveFormsModule, AvatarComponent, ModalComponent, TaskCardComponent, CdkDropList, CdkDrag],
   templateUrl: './task-column.component.html',
   styleUrl: './task-column.component.css'
 })
@@ -42,6 +56,8 @@ export class TaskColumnComponent implements OnInit, OnChanges {
   private readonly notifications = inject(NotificationService);
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
+  private readonly boardSync = inject(TaskBoardSyncService);
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly loading = signal(false);
   readonly loadingMore = signal(false);
@@ -102,6 +118,55 @@ export class TaskColumnComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.load(true);
+
+    this.boardSync.statusChanges$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(({ task, previousStatus }) => {
+      if (task.status === this.status) {
+        this.tasks.update((list) => {
+          const idx = list.findIndex((t) => t.id === task.id);
+
+          if (idx === -1) {
+            this.totalElements.update((n) => n + 1);
+            return [task, ...list];
+          }
+
+          const copy = [...list];
+          copy[idx] = task;
+
+          return copy;
+        });
+
+      } else if (previousStatus === this.status) {
+        this.tasks.update((list) => {
+          if (!list.some((t) => t.id === task.id)) {
+            return list;
+          }
+
+          this.totalElements.update((n) => Math.max(0, n - 1));
+          return list.filter((t) => t.id !== task.id);
+        });
+      }
+    });
+  }
+
+  onDrop(event: CdkDragDrop<TaskResponse[]>): void {
+    const task = event.item.data as TaskResponse;
+    const previousStatus = task.status;
+    const newStatus = this.status;
+
+    if (event.previousContainer === event.container || newStatus === previousStatus) {
+      return;
+    }
+
+    const optimisticTask: TaskResponse = { ...task, status: newStatus };
+    this.boardSync.publishStatusChange(optimisticTask, previousStatus);
+
+    this.api.updateTaskStatus(this.projectId, task.id, newStatus).subscribe({
+      next: (confirmed) => this.boardSync.publishStatusChange(confirmed, previousStatus),
+      error: (error) => {
+        this.boardSync.publishStatusChange(task, newStatus);
+        this.notifications.error('Falha ao mover tarefa', getHttpErrorMessage(error));
+      }
+    });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -406,6 +471,7 @@ export class TaskColumnComponent implements OnInit, OnChanges {
       return;
     }
 
+    const previousStatus = task.status;
     this.savingField.set(field);
 
     this.api
@@ -419,7 +485,12 @@ export class TaskColumnComponent implements OnInit, OnChanges {
           this.dueDateDraft.set(updated.due_date ? updated.due_date.slice(0, 10) : '');
           this.notifications.success('Tarefa atualizada', successMessage);
           onSuccess?.();
-          this.load(true);
+          
+          if (field === 'status') {
+            this.boardSync.publishStatusChange(updated, previousStatus);
+          } else {
+            this.load(true);
+          }
         },
         error: (error) => this.notifications.error('Falha ao atualizar tarefa', getHttpErrorMessage(error))
       });

@@ -1,3 +1,4 @@
+import { CdkDropListGroup } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
@@ -18,6 +19,7 @@ import { NotificationService } from '../core/notification.service';
 import { AvatarComponent } from '../shared/avatar/avatar.component';
 import { ModalComponent } from '../shared/modal/modal.component';
 import { TaskColumnComponent } from '../shared/task-column/task-column.component';
+import { TaskBoardSyncService } from './task-board-sync.service';
 
 interface BoardColumn {
   status: TaskStatus;
@@ -33,7 +35,8 @@ const DEFAULT_TASK_SORT = 'created_at,desc';
 @Component({
   selector: 'app-board',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, AvatarComponent, ModalComponent, TaskColumnComponent],
+  imports: [CommonModule, ReactiveFormsModule, AvatarComponent, ModalComponent, TaskColumnComponent, CdkDropListGroup],
+  providers: [TaskBoardSyncService],
   templateUrl: './board.component.html',
   styleUrl: './board.component.css'
 })

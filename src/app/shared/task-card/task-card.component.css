@@ -10,8 +10,12 @@
   border-radius: 10px;
   background: var(--surface);
   padding: 12px 14px;
-  cursor: pointer;
+  cursor: grab;
   transition: border-color 0.15s ease;
+}
+
+.task-card:active {
+  cursor: grabbing;
 }
 
 .task-card:hover,

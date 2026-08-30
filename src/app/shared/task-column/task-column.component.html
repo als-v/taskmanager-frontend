@@ -8,11 +8,11 @@
     <button class="ghost-button icon-button" type="button" (click)="openCreateModal()" [attr.aria-label]="'Adicionar tarefa em ' + title">+</button>
   </header>
 
-  <div class="column-body" (scroll)="onScroll($event)">
+  <div class="column-body" cdkDropList [cdkDropListData]="tasks()" (cdkDropListDropped)="onDrop($event)" (scroll)="onScroll($event)">
     <p class="table-state" *ngIf="loading()">Carregando...</p>
 
     <ng-container *ngIf="!loading()">
-      <app-task-card *ngFor="let task of tasks()" [task]="task" (open)="openDetailModal(task)" />
+      <app-task-card *ngFor="let task of tasks()" [task]="task" cdkDrag [cdkDragData]="task" (open)="openDetailModal(task)" />
       <p class="table-state" *ngIf="tasks().length === 0">Nenhuma tarefa.</p>
       <p class="load-more-state" *ngIf="loadingMore()">Carregando mais...</p>
     </ng-container>

@@ -296,6 +296,10 @@ export class ApiService {
     return this.http.patch<TaskResponse>(`${this.apiUrl}/api/projects/${projectId}/tasks/${taskId}`, payload);
   }
 
+  updateTaskStatus(projectId: string, taskId: string, status: TaskStatus): Observable<TaskResponse> {
+    return this.http.patch<TaskResponse>(`${this.apiUrl}/api/projects/${projectId}/tasks/${taskId}/status`, { status });
+  }
+
   getAuditLogs(
     projectId: string,
     page: number,
