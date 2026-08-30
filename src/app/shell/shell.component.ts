@@ -5,11 +5,12 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { AuthService } from '../core/auth.service';
 import { ThemeService } from '../core/theme.service';
 import { AvatarComponent } from '../shared/avatar/avatar.component';
+import { NotificationBellComponent } from '../shared/notification-bell/notification-bell.component';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet, AvatarComponent],
+  imports: [CommonModule, RouterLink, RouterLinkActive, RouterOutlet, AvatarComponent, NotificationBellComponent],
   templateUrl: './shell.component.html',
   styleUrl: './shell.component.css'
 })

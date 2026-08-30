@@ -28,25 +28,29 @@
         <span>Gerenciamento de tarefas</span>
       </div>
 
-      <div class="user-area" [class.open]="userMenuOpen()">
-        <div class="user-summary">
-          <strong>{{ auth.session()?.user?.name || auth.session()?.user?.email || 'Usuario' }}</strong>
-        </div>
-        <button class="avatar-button" type="button" aria-label="Abrir menu do usuario" aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen()" (click)="toggleUserMenu()">
-          <app-avatar [name]="auth.session()?.user?.name || auth.session()?.user?.email || 'Usuario'" />
-          <svg class="user-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 10l4 4 4-4" /></svg>
-        </button>
+      <div class="topbar-actions">
+        <app-notification-bell />
 
-        <div class="user-dropdown" role="menu" *ngIf="userMenuOpen()">
-          <button class="dropdown-item" type="button" role="menuitem" (click)="toggleTheme()">
-            <svg viewBox="0 0 24 24" aria-hidden="true" *ngIf="!theme.isDark()"><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M3 12h2M19 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" /><circle cx="12" cy="12" r="4" /></svg>
-            <svg viewBox="0 0 24 24" aria-hidden="true" *ngIf="theme.isDark()"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
-            <span>{{ theme.isDark() ? 'Modo claro' : 'Modo escuro' }}</span>
+        <div class="user-area" [class.open]="userMenuOpen()">
+          <div class="user-summary">
+            <strong>{{ auth.session()?.user?.name || auth.session()?.user?.email || 'Usuario' }}</strong>
+          </div>
+          <button class="avatar-button" type="button" aria-label="Abrir menu do usuario" aria-haspopup="menu" [attr.aria-expanded]="userMenuOpen()" (click)="toggleUserMenu()">
+            <app-avatar [name]="auth.session()?.user?.name || auth.session()?.user?.email || 'Usuario'" />
+            <svg class="user-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 10l4 4 4-4" /></svg>
           </button>
-          <button class="dropdown-item danger" type="button" role="menuitem" (click)="logout()">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>
-            <span>Sair da plataforma</span>
-          </button>
+
+          <div class="user-dropdown" role="menu" *ngIf="userMenuOpen()">
+            <button class="dropdown-item" type="button" role="menuitem" (click)="toggleTheme()">
+              <svg viewBox="0 0 24 24" aria-hidden="true" *ngIf="!theme.isDark()"><path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M3 12h2M19 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" /><circle cx="12" cy="12" r="4" /></svg>
+              <svg viewBox="0 0 24 24" aria-hidden="true" *ngIf="theme.isDark()"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+              <span>{{ theme.isDark() ? 'Modo claro' : 'Modo escuro' }}</span>
+            </button>
+            <button class="dropdown-item danger" type="button" role="menuitem" (click)="logout()">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" /></svg>
+              <span>Sair da plataforma</span>
+            </button>
+          </div>
         </div>
       </div>
     </header>

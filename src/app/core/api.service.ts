@@ -159,6 +159,20 @@ export interface DashboardWipResponse {
   generated_at: string;
 }
 
+export type NotificationType = 'TASK_ASSIGNED' | 'PROJECT_ADDED';
+
+export interface NotificationResponse {
+  id: string;
+  type: NotificationType;
+  message: string;
+  project_id: string | null;
+  task_id: string | null;
+  created_by: string | null;
+  created_at: string;
+  read_at: string | null;
+  unread: boolean;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
@@ -324,5 +338,19 @@ export class ApiService {
 
   logout(refreshToken: string): Observable<void> {
     return this.http.post<void>(`${this.apiUrl}/api/auth/logout`, { refresh_token: refreshToken });
+  }
+
+  getNotifications(unread?: boolean, page = 0, size = 20): Observable<PageResponse<NotificationResponse>> {
+    let params = new HttpParams().set('page', String(page)).set('size', String(size));
+
+    if (unread !== undefined) {
+      params = params.set('unread', String(unread));
+    }
+
+    return this.http.get<PageResponse<NotificationResponse>>(`${this.apiUrl}/api/notifications`, { params });
+  }
+
+  markNotificationRead(notificationId: string): Observable<NotificationResponse> {
+    return this.http.patch<NotificationResponse>(`${this.apiUrl}/api/notifications/${notificationId}/read`, {});
   }
 }

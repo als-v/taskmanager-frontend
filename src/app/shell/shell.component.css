@@ -189,6 +189,12 @@
   font-weight: 650;
 }
 
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .user-area {
   position: relative;
   display: flex;
@@ -346,8 +352,12 @@
     flex-direction: column;
   }
 
-  .user-area {
+  .topbar-actions {
     width: 100%;
+    justify-content: space-between;
+  }
+
+  .user-area {
     justify-content: space-between;
   }
 
