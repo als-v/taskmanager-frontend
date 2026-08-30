@@ -26,7 +26,14 @@
       <p class="table-state" *ngIf="loading()">Carregando...</p>
 
       <ng-container *ngIf="!loading()">
-        <article class="card" *ngFor="let project of projects()">
+        <article
+          class="card"
+          *ngFor="let project of projects()"
+          role="button"
+          tabindex="0"
+          (click)="openProject(project)"
+          (keydown.enter)="openProject(project)"
+        >
           <div class="card-main">
             <strong class="card-title">{{ project.name }}</strong>
             <p class="card-description">{{ project.description || 'Sem descricao.' }}</p>
@@ -43,22 +50,16 @@
     </ng-template>
   </div>
 
-  <footer class="pagination" *ngIf="totalElements() > 0">
-    <label class="page-size">
-      <span>Itens por pagina</span>
-      <select (change)="onPageSizeChange($any($event.target).value)">
-        <option *ngFor="let option of pageSizeOptions" [value]="option" [selected]="option === pageSize()">{{ option }}</option>
-      </select>
-    </label>
-
-    <span>{{ startItem() }}-{{ endItem() }} de {{ totalElements() }}</span>
-
-    <div>
-      <button type="button" (click)="previousPage()" [disabled]="page() <= 0">Anterior</button>
-      <strong>{{ page() + 1 }} / {{ totalPages() }}</strong>
-      <button type="button" (click)="nextPage()" [disabled]="page() + 1 >= totalPages()">Proxima</button>
-    </div>
-  </footer>
+  <app-pagination
+    [page]="page()"
+    [pageSize]="pageSize()"
+    [pageSizeOptions]="pageSizeOptions"
+    [totalElements]="totalElements()"
+    [totalPages]="totalPages()"
+    [loading]="loading()"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+  />
 
   <app-modal [open]="showCreateModal()" title="Novo projeto" (closed)="closeCreateModal()">
     <form class="project-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">

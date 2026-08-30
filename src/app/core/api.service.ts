@@ -46,6 +46,59 @@ export interface PageResponse<T> {
   total_pages: number;
 }
 
+export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'DONE';
+export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+
+export interface ProjectMemberResponse {
+  user_id: string;
+  name: string;
+  email: string;
+  role: 'ADMIN' | 'MEMBER';
+  joined_at: string;
+}
+
+export interface UserResponse {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface TaskAssigneeResponse {
+  id: string;
+  name: string;
+  email: string;
+}
+
+export interface TaskResponse {
+  id: string;
+  project_id: string;
+  title: string;
+  description: string | null;
+  status: TaskStatus;
+  priority: TaskPriority;
+  assignee: TaskAssigneeResponse | null;
+  due_date: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateTaskPayload {
+  title: string;
+  description?: string | null;
+  status: TaskStatus;
+  priority: TaskPriority;
+  assignee_id?: string | null;
+  due_date?: string | null;
+}
+
+export interface TaskFilterOptions {
+  title?: string;
+  priority?: TaskPriority;
+  assigneeId?: string;
+  unassigned?: boolean;
+  dueDate?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
@@ -76,6 +129,84 @@ export class ApiService {
 
   createProject(payload: CreateProjectPayload): Observable<ProjectResponse> {
     return this.http.post<ProjectResponse>(`${this.apiUrl}/api/projects`, payload);
+  }
+
+  getProject(id: string): Observable<ProjectResponse> {
+    return this.http.get<ProjectResponse>(`${this.apiUrl}/api/projects/${id}`);
+  }
+
+  getProjectMembers(
+    projectId: string,
+    page: number,
+    size: number,
+    name?: string,
+    email?: string
+  ): Observable<PageResponse<ProjectMemberResponse>> {
+    let params = new HttpParams().set('page', String(page)).set('size', String(size));
+
+    if (name?.trim()) {
+      params = params.set('name', name.trim());
+    }
+    if (email?.trim()) {
+      params = params.set('email', email.trim());
+    }
+
+    return this.http.get<PageResponse<ProjectMemberResponse>>(`${this.apiUrl}/api/projects/${projectId}/members`, { params });
+  }
+
+  addProjectMembers(projectId: string, userIds: string[]): Observable<ProjectMemberResponse[]> {
+    return this.http.post<ProjectMemberResponse[]>(`${this.apiUrl}/api/projects/${projectId}/members`, { user_ids: userIds });
+  }
+
+  searchAddableUsers(
+    projectId: string,
+    page: number,
+    size: number,
+    name?: string,
+    email?: string
+  ): Observable<PageResponse<UserResponse>> {
+    let params = new HttpParams().set('project_id', projectId).set('page', String(page)).set('size', String(size));
+
+    if (name?.trim()) {
+      params = params.set('name', name.trim());
+    }
+
+    if (email?.trim()) {
+      params = params.set('email', email.trim());
+    }
+
+    return this.http.get<PageResponse<UserResponse>>(`${this.apiUrl}/api/users`, { params });
+  }
+
+  getTasks(
+    projectId: string,
+    opts: TaskFilterOptions & { status: TaskStatus; page: number; size: number }
+  ): Observable<PageResponse<TaskResponse>> {
+    let params = new HttpParams().set('status', opts.status).set('page', String(opts.page)).set('size', String(opts.size));
+
+    if (opts.title?.trim()) {
+      params = params.set('title', opts.title.trim());
+    }
+
+    if (opts.priority) {
+      params = params.set('priority', opts.priority);
+    }
+
+    if (opts.unassigned) {
+      params = params.set('unassigned', 'true');
+    } else if (opts.assigneeId) {
+      params = params.set('assignee_id', opts.assigneeId);
+    }
+    
+    if (opts.dueDate) {
+      params = params.set('due_date_from', `${opts.dueDate}T00:00:00`).set('due_date_to', `${opts.dueDate}T23:59:59`);
+    }
+
+    return this.http.get<PageResponse<TaskResponse>>(`${this.apiUrl}/api/projects/${projectId}/tasks`, { params });
+  }
+
+  createTask(projectId: string, payload: CreateTaskPayload): Observable<TaskResponse> {
+    return this.http.post<TaskResponse>(`${this.apiUrl}/api/projects/${projectId}/tasks`, payload);
   }
 
   signUp(payload: SignUpPayload): Observable<AuthUser> {

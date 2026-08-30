@@ -1,0 +1,71 @@
+<section class="task-column" [attr.data-status]="status" [attr.aria-label]="title">
+  <header class="column-header">
+    <div class="column-title">
+      <span class="column-dot"></span>
+      <strong>{{ title }}</strong>
+      <span class="column-count">{{ totalElements() }}</span>
+    </div>
+    <button class="ghost-button icon-button" type="button" (click)="openCreateModal()" [attr.aria-label]="'Adicionar tarefa em ' + title">+</button>
+  </header>
+
+  <div class="column-body" (scroll)="onScroll($event)">
+    <p class="table-state" *ngIf="loading()">Carregando...</p>
+
+    <ng-container *ngIf="!loading()">
+      <app-task-card *ngFor="let task of tasks()" [task]="task" />
+      <p class="table-state" *ngIf="tasks().length === 0">Nenhuma tarefa.</p>
+      <p class="load-more-state" *ngIf="loadingMore()">Carregando mais...</p>
+    </ng-container>
+  </div>
+
+  <app-modal [open]="showCreateModal()" [title]="'Nova tarefa - ' + title" (closed)="closeCreateModal()">
+    <form class="task-form" [formGroup]="createForm" (ngSubmit)="submitCreate()">
+      <label class="field">
+        <span>Titulo</span>
+        <input type="text" formControlName="title" maxlength="200" placeholder="Titulo da tarefa" autocomplete="off" />
+        <small class="field-error" *ngIf="createForm.get('title')?.touched && createForm.get('title')?.hasError('required')">
+          Informe o titulo da tarefa.
+        </small>
+        <small class="field-error" *ngIf="createForm.get('title')?.hasError('maxlength')">
+          O titulo deve ter no maximo 200 caracteres.
+        </small>
+      </label>
+
+      <label class="field">
+        <span>Descricao</span>
+        <textarea formControlName="description" maxlength="2000" rows="3" placeholder="Detalhes da tarefa (opcional)"></textarea>
+        <small class="field-error" *ngIf="createForm.get('description')?.hasError('maxlength')">
+          A descricao deve ter no maximo 2000 caracteres.
+        </small>
+      </label>
+
+      <label class="field">
+        <span>Prioridade</span>
+        <select formControlName="priority">
+          <option value="LOW">Baixa</option>
+          <option value="MEDIUM">Media</option>
+          <option value="HIGH">Alta</option>
+          <option value="CRITICAL">Critica</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span>Responsavel</span>
+        <select formControlName="assigneeId">
+          <option value="">Sem responsavel</option>
+          <option *ngFor="let member of members" [value]="member.user_id">{{ member.name }}</option>
+        </select>
+      </label>
+
+      <label class="field">
+        <span>Prazo</span>
+        <input type="date" formControlName="dueDate" />
+      </label>
+
+      <div class="form-actions">
+        <button class="ghost-button" type="button" (click)="closeCreateModal()" [disabled]="creating()">Cancelar</button>
+        <button class="primary-button" type="submit" [disabled]="creating()">{{ creating() ? 'Criando...' : 'Criar tarefa' }}</button>
+      </div>
+    </form>
+  </app-modal>
+</section>

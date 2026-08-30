@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { authGuard } from './core/auth.guard';
+import { BoardComponent } from './board/board.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoginComponent } from './login/login.component';
 import { ProjetosComponent } from './projetos/projetos.component';
@@ -16,7 +17,8 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: '', pathMatch: 'full', component: DashboardComponent },
-      { path: 'projetos', component: ProjetosComponent }
+      { path: 'projetos', component: ProjetosComponent },
+      { path: 'projetos/:id', component: BoardComponent }
     ]
   },
   { path: '**', redirectTo: '' }

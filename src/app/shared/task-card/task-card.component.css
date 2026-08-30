@@ -1,0 +1,142 @@
+:host {
+  display: block;
+}
+
+.task-card {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  border-radius: 10px;
+  background: var(--surface);
+  padding: 12px 14px;
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.task-card:hover {
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+  transform: translateY(-1px);
+}
+
+.task-card-overdue {
+  border-color: var(--danger);
+  border-left-width: 4px;
+  background: var(--danger-soft);
+}
+
+.task-title {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.task-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.assignee {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+}
+
+.assignee-name {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assignee-empty .assignee-name {
+  font-style: italic;
+}
+
+.app-avatar.unassigned {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 999px;
+  color: var(--text-muted);
+  background: var(--surface-muted);
+  border: 1px dashed var(--border-strong);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.badge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.priority-low {
+  color: #64748b;
+  background: #e2e8f0;
+}
+
+.priority-medium {
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
+.priority-high {
+  color: #b45309;
+  background: #fef3c7;
+}
+
+.priority-critical {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.due-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.due-date svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.due-date-overdue {
+  color: var(--danger);
+}
+
+.overdue-label {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  padding: 2px 9px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--danger);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}

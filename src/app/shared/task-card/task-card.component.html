@@ -1,0 +1,26 @@
+<article class="task-card" [class.task-card-overdue]="isOverdue">
+  <strong class="task-title">{{ task.title }}</strong>
+
+  <div class="task-meta">
+    <span class="assignee" *ngIf="task.assignee; else unassigned">
+      <app-avatar [name]="task.assignee.name" size="sm" />
+      <span class="assignee-name">{{ task.assignee.name }}</span>
+    </span>
+    <ng-template #unassigned>
+      <span class="assignee assignee-empty">
+        <span class="app-avatar app-avatar-sm unassigned" aria-hidden="true">-</span>
+        <span class="assignee-name">Nao atribuido</span>
+      </span>
+    </ng-template>
+
+    <span class="badge" [class]="'priority-' + task.priority.toLowerCase()">
+      {{ priorityLabels[task.priority] || task.priority }}
+    </span>
+  </div>
+
+  <div class="due-date" *ngIf="task.due_date" [class.due-date-overdue]="isOverdue">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 3" /></svg>
+    <span>{{ task.due_date | date: 'dd/MM/yyyy HH:mm' }}</span>
+    <span class="overdue-label" *ngIf="isOverdue">Atrasada</span>
+  </div>
+</article>

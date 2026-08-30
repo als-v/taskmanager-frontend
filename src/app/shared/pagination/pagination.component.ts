@@ -9,7 +9,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   styleUrl: './pagination.component.css'
 })
 export class PaginationComponent {
-  @Input({ required: true }) page = 0; // 0-based
+  @Input({ required: true }) page = 0;
   @Input({ required: true }) pageSize = 10;
   @Input() pageSizeOptions: number[] = [10, 25, 50, 100];
   @Input({ required: true }) totalElements = 0;

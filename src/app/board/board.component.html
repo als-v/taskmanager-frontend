@@ -1,0 +1,135 @@
+<section class="board" aria-labelledby="board-title">
+  <header class="board-header">
+    <div class="board-header-title">
+      <button class="ghost-button icon-button" type="button" (click)="goBack()" aria-label="Voltar para projetos">←</button>
+      <h1 id="board-title">{{ project()?.name || 'Projeto' }}</h1>
+    </div>
+
+    <div class="task-filters-panel">
+      <div class="task-filters-header">
+        <strong>Filtros</strong>
+        <button class="link-button" type="button" *ngIf="hasActiveTaskFilters()" (click)="clearTaskFilters()">Limpar filtros</button>
+      </div>
+
+      <form class="task-filters" [formGroup]="taskFilterForm">
+        <label class="field">
+          <span>Nome</span>
+          <input type="text" formControlName="title" placeholder="Buscar por titulo..." autocomplete="off" />
+        </label>
+
+        <label class="field">
+          <span>Etapa</span>
+          <select formControlName="status">
+            <option value="">Todas</option>
+            <option value="TODO">A fazer</option>
+            <option value="IN_PROGRESS">Em andamento</option>
+            <option value="DONE">Concluido</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Responsavel</span>
+          <select formControlName="assigneeId">
+            <option value="">Todos</option>
+            <option value="unassigned">Nao atribuido</option>
+            <option *ngFor="let member of members()" [value]="member.user_id">{{ member.name }}</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Prioridade</span>
+          <select formControlName="priority">
+            <option value="">Todas</option>
+            <option value="LOW">Baixa</option>
+            <option value="MEDIUM">Media</option>
+            <option value="HIGH">Alta</option>
+            <option value="CRITICAL">Critica</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span>Prazo</span>
+          <input type="date" formControlName="dueDate" />
+        </label>
+      </form>
+    </div>
+  </header>
+
+  <div class="board-body">
+    <aside class="members-panel" aria-label="Membros do projeto">
+      <header class="members-panel-header">
+        <strong>Membros</strong>
+      </header>
+
+      <div class="members-list" (scroll)="onMembersScroll($event)">
+        <p class="table-state" *ngIf="membersLoading()">Carregando...</p>
+
+        <ng-container *ngIf="!membersLoading()">
+          <div class="member-item" *ngFor="let member of members()">
+            <app-avatar [name]="member.name" size="sm" />
+            <span class="member-name">{{ member.name }}</span>
+            <span class="badge" [class.badge-admin]="member.role === 'ADMIN'" [class.badge-member]="member.role === 'MEMBER'">
+              {{ member.role === 'ADMIN' ? 'Admin' : 'Membro' }}
+            </span>
+          </div>
+          <p class="table-state" *ngIf="members().length === 0">Nenhum membro.</p>
+          <p class="load-more-state" *ngIf="membersLoadingMore()">Carregando mais...</p>
+        </ng-container>
+      </div>
+
+      <button class="primary-button add-member-button" type="button" *ngIf="isAdmin()" (click)="openAddMemberModal()">
+        Adicionar usuario
+      </button>
+    </aside>
+
+    <div class="columns">
+      <app-task-column
+        *ngFor="let column of visibleColumns()"
+        [projectId]="projectId"
+        [status]="column.status"
+        [title]="column.title"
+        [members]="members()"
+        [filters]="columnFilters()"
+      />
+    </div>
+  </div>
+
+  <app-modal [open]="showAddMemberModal()" title="Adicionar usuario ao projeto" (closed)="closeAddMemberModal()">
+    <div class="add-member-form">
+      <form class="candidate-search" [formGroup]="addMemberSearchForm">
+        <label class="field field-inline">
+          <span>Nome</span>
+          <input type="text" formControlName="name" placeholder="Buscar por nome..." autocomplete="off" />
+        </label>
+        <label class="field field-inline">
+          <span>Email</span>
+          <input type="text" formControlName="email" placeholder="Buscar por email..." autocomplete="off" />
+        </label>
+      </form>
+
+      <div class="candidate-list" (scroll)="onCandidatesScroll($event)">
+        <p class="table-state" *ngIf="candidatesLoading()">Carregando...</p>
+
+        <ng-container *ngIf="!candidatesLoading()">
+          <label class="candidate-item" *ngFor="let candidate of candidates()">
+            <input type="checkbox" [checked]="isSelected(candidate.id)" (change)="toggleCandidate(candidate.id)" />
+            <app-avatar [name]="candidate.name" size="sm" />
+            <span class="candidate-info">
+              <strong>{{ candidate.name }}</strong>
+              <small>{{ candidate.email }}</small>
+            </span>
+          </label>
+          <p class="table-state" *ngIf="candidates().length === 0">Nenhum usuario encontrado.</p>
+          <p class="load-more-state" *ngIf="candidatesLoadingMore()">Carregando mais...</p>
+        </ng-container>
+      </div>
+
+      <div class="form-actions">
+        <button class="ghost-button" type="button" (click)="closeAddMemberModal()" [disabled]="addingMembers()">Cancelar</button>
+        <button class="primary-button" type="button" (click)="submitAddMembers()" [disabled]="addingMembers()">
+          {{ addingMembers() ? 'Adicionando...' : 'Adicionar selecionados' }}
+        </button>
+      </div>
+    </div>
+  </app-modal>
+</section>
