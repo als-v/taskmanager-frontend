@@ -146,6 +146,10 @@ export class BoardComponent implements OnInit {
     void this.router.navigate(['/projetos']);
   }
 
+  openLogs(): void {
+    void this.router.navigate(['/projetos', this.projectId, 'logs']);
+  }
+
   clearTaskFilters(): void {
     this.taskFilterForm.reset({ title: '', status: '', assigneeId: '', priority: '', dueDate: '' });
     this.taskFilterValues.set(this.taskFilterForm.getRawValue());

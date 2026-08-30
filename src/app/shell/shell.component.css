@@ -1,13 +1,15 @@
 :host {
   display: block;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: var(--app-bg);
 }
 
 .layout-shell {
   display: grid;
   grid-template-columns: 248px minmax(0, 1fr);
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background: var(--app-bg);
   transition: grid-template-columns 160ms ease;
 }
@@ -142,7 +144,9 @@
   width: 100%;
   max-width: 100%;
   min-width: 0;
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
   flex-direction: column;
   padding: 10px 12px 14px;
 }
@@ -277,6 +281,7 @@
   min-width: 0;
   min-height: 0;
   flex: 1 1 auto;
+  overflow: hidden;
   align-items: stretch;
   margin-top: 18px;
 }
@@ -294,15 +299,31 @@
 }
 
 @media (max-width: 860px) {
+  :host {
+    height: auto;
+    overflow: visible;
+  }
+
   .layout-shell,
   .layout-shell.sidebar-collapsed {
     grid-template-columns: 1fr;
+    height: auto;
+    overflow: visible;
   }
 
   .sidebar {
     position: relative;
     height: auto;
     min-height: auto;
+  }
+
+  .workspace {
+    height: auto;
+    overflow: visible;
+  }
+
+  .content-panel {
+    overflow: visible;
   }
 
   .sidebar-collapsed .sidebar-brand {

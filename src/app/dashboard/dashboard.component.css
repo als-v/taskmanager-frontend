@@ -9,7 +9,10 @@
 .dashboard {
   display: grid;
   width: 100%;
+  min-height: 0;
+  align-content: start;
   gap: 22px;
+  overflow-y: auto;
 }
 
 .dashboard-header h1 {

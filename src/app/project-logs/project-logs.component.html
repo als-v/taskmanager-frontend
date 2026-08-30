@@ -1,0 +1,112 @@
+<section class="project-logs" aria-labelledby="project-logs-title">
+  <header class="project-logs-header">
+    <div class="project-logs-header-title">
+      <button class="ghost-button icon-button" type="button" (click)="goBack()" aria-label="Voltar para o projeto">←</button>
+      <h1 id="project-logs-title">Logs — {{ project()?.name || 'Projeto' }}</h1>
+    </div>
+  </header>
+
+  <form class="project-logs-filters" [formGroup]="filterForm">
+    <label class="field field-inline">
+      <span>Usuário</span>
+      <div class="actor-select" [class.open]="actorMenuOpen()">
+        <button
+          class="actor-select-trigger"
+          type="button"
+          aria-haspopup="listbox"
+          [attr.aria-expanded]="actorMenuOpen()"
+          (click)="toggleActorMenu()"
+        >
+          <span class="actor-select-label">{{ selectedActorLabel() }}</span>
+        </button>
+
+        <div class="actor-select-menu" role="listbox" *ngIf="actorMenuOpen()" (scroll)="onMembersScroll($event)">
+          <button
+            class="actor-select-option"
+            type="button"
+            role="option"
+            [class.selected]="selectedActorId() === ''"
+            (click)="selectActor('')"
+          >
+            Todos
+          </button>
+
+          <ng-container *ngIf="!membersLoading()">
+            <button
+              class="actor-select-option"
+              type="button"
+              role="option"
+              *ngFor="let member of members()"
+              [class.selected]="selectedActorId() === member.user_id"
+              (click)="selectActor(member.user_id)"
+            >
+              {{ member.name }}
+            </button>
+            <p class="load-more-state" *ngIf="membersLoadingMore()">Carregando mais...</p>
+          </ng-container>
+
+          <p class="table-state" *ngIf="membersLoading()">Carregando...</p>
+        </div>
+      </div>
+    </label>
+
+    <label class="field field-inline">
+      <span>Ação</span>
+      <select formControlName="action">
+        <option value="">Todas</option>
+        <option *ngFor="let opt of actionOptions" [value]="opt.value">{{ opt.label }}</option>
+      </select>
+    </label>
+
+    <button class="ghost-button" type="button" (click)="clearFilters()" *ngIf="hasActiveFilters()">Limpar filtros</button>
+  </form>
+
+  <div class="project-logs-body">
+    <table class="logs-table" *ngIf="loading() || logs().length; else emptyState">
+      <thead>
+        <tr>
+          <th>Data/hora</th>
+          <th>Usuário</th>
+          <th>Tarefa</th>
+          <th>Ação</th>
+          <th>Detalhe</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading()">
+          <td class="table-state" colspan="5">Carregando...</td>
+        </tr>
+
+        <ng-container *ngIf="!loading()">
+          <tr *ngFor="let log of logs()">
+            <td>{{ log.created_at | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ actorName(log.actor_id) }}</td>
+            <td>{{ taskLabel(log.task_id) }}</td>
+            <td><span class="badge badge-action">{{ actionLabel(log.action) }}</span></td>
+            <td>
+              <ng-container *ngIf="log.action === 'STATUS_CHANGED'; else genericDetail">
+                {{ statusLabel(log.from_status) }} → {{ statusLabel(log.to_status) }}
+              </ng-container>
+              <ng-template #genericDetail>—</ng-template>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+
+    <ng-template #emptyState>
+      <p class="table-state">Nenhum log encontrado.</p>
+    </ng-template>
+  </div>
+
+  <app-pagination
+    [page]="page()"
+    [pageSize]="pageSize()"
+    [pageSizeOptions]="pageSizeOptions"
+    [totalElements]="totalElements()"
+    [totalPages]="totalPages()"
+    [loading]="loading()"
+    (pageChange)="onPageChange($event)"
+    (pageSizeChange)="onPageSizeChange($event)"
+  />
+</section>

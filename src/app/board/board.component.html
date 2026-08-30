@@ -2,6 +2,7 @@
   <header class="board-header">
     <div class="board-header-title">
       <button class="ghost-button icon-button" type="button" (click)="goBack()" aria-label="Voltar para projetos">←</button>
+      <button class="ghost-button" type="button" (click)="openLogs()">Ver logs</button>
       <h1 id="board-title">{{ project()?.name || 'Projeto' }}</h1>
     </div>
 

@@ -99,6 +99,26 @@ export interface TaskFilterOptions {
   dueDate?: string;
 }
 
+export type AuditAction =
+  | 'TASK_CREATED'
+  | 'TASK_UPDATED'
+  | 'STATUS_CHANGED'
+  | 'PRIORITY_CHANGED'
+  | 'ASSIGNEE_CHANGED'
+  | 'DUE_DATE_CHANGED'
+  | 'TASK_DELETED';
+
+export interface AuditLogResponse {
+  id: string;
+  project_id: string;
+  task_id: string;
+  actor_id: string;
+  action: AuditAction;
+  from_status: TaskStatus | null;
+  to_status: TaskStatus | null;
+  created_at: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
@@ -207,6 +227,25 @@ export class ApiService {
 
   createTask(projectId: string, payload: CreateTaskPayload): Observable<TaskResponse> {
     return this.http.post<TaskResponse>(`${this.apiUrl}/api/projects/${projectId}/tasks`, payload);
+  }
+
+  getAuditLogs(
+    projectId: string,
+    page: number,
+    size: number,
+    actorId?: string,
+    action?: AuditAction
+  ): Observable<PageResponse<AuditLogResponse>> {
+    let params = new HttpParams().set('page', String(page)).set('size', String(size));
+
+    if (actorId) {
+      params = params.set('actor_id', actorId);
+    }
+    if (action) {
+      params = params.set('action', action);
+    }
+
+    return this.http.get<PageResponse<AuditLogResponse>>(`${this.apiUrl}/api/projects/${projectId}/logs`, { params });
   }
 
   signUp(payload: SignUpPayload): Observable<AuthUser> {
