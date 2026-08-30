@@ -23,7 +23,7 @@
           <div class="breakdown-row" *ngFor="let row of statusBreakdown()">
             <span class="breakdown-label">{{ row.label }}</span>
             <div class="breakdown-bar-track">
-              <div class="breakdown-bar" [class]="'status-' + row.key.toLowerCase()" [style.width.%]="row.percent"></div>
+              <div class="breakdown-bar" [style.width.%]="row.percent"></div>
             </div>
             <span class="breakdown-total">{{ row.total }}</span>
           </div>
@@ -46,12 +46,13 @@
 
     <div class="card">
       <span class="card-label">Responsaveis com tarefas em andamento</span>
-      <div class="wip-list" *ngIf="sortedWip().length; else emptyWip">
-        <div class="wip-row" *ngFor="let item of sortedWip()">
+      <div class="wip-list" *ngIf="sortedWip().length; else emptyWip" (scroll)="onWipScroll($event)">
+        <div class="wip-row" *ngFor="let item of visibleWip()">
           <app-avatar [name]="item.name" size="sm" />
           <span class="wip-name">{{ item.name }}</span>
           <span class="badge badge-wip">{{ item.in_progress }}</span>
         </div>
+        <p class="load-more-state" *ngIf="hasMoreWip()">Role para ver mais...</p>
       </div>
       <ng-template #emptyWip>
         <p class="empty-state">Nenhuma tarefa em andamento no escopo selecionado.</p>

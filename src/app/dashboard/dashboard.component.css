@@ -78,7 +78,6 @@
   border-radius: 12px;
   background: var(--surface);
   padding: 20px;
-  box-shadow: var(--shadow);
 }
 
 .card-alert {
@@ -152,19 +151,8 @@
 .breakdown-bar {
   height: 100%;
   border-radius: 999px;
+  background: var(--primary);
   transition: width 0.2s ease;
-}
-
-.status-todo {
-  background: #64748b;
-}
-
-.status-in_progress {
-  background: #1d4ed8;
-}
-
-.status-done {
-  background: #15803d;
 }
 
 .priority-low {
@@ -185,7 +173,18 @@
 
 .wip-list {
   display: grid;
+  max-height: 320px;
   gap: 10px;
+  overflow-y: auto;
+}
+
+.load-more-state {
+  margin: 0;
+  padding: 8px 0 2px;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
 }
 
 .wip-row {
@@ -257,13 +256,12 @@
   border-radius: 12px;
   background: var(--surface);
   padding: 16px;
-  box-shadow: var(--shadow);
   cursor: pointer;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  transition: border-color 0.15s ease;
 }
 
 .project-tile:hover {
-  transform: translateY(-1px);
+  border-color: var(--border-strong);
 }
 
 .project-tile.selected {

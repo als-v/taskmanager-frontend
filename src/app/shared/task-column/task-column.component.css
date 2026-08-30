@@ -14,18 +14,9 @@
   flex-direction: column;
   gap: 12px;
   border: 1px solid var(--border);
-  border-top: 3px solid var(--text-muted);
   border-radius: 12px;
   background: var(--surface-subtle);
   padding: 14px;
-}
-
-.task-column[data-status='IN_PROGRESS'] {
-  border-top-color: var(--primary);
-}
-
-.task-column[data-status='DONE'] {
-  border-top-color: #15803d;
 }
 
 .column-header {
@@ -49,14 +40,6 @@
   height: 8px;
   border-radius: 999px;
   background: var(--text-muted);
-}
-
-.task-column[data-status='IN_PROGRESS'] .column-dot {
-  background: var(--primary);
-}
-
-.task-column[data-status='DONE'] .column-dot {
-  background: #15803d;
 }
 
 .column-title strong {

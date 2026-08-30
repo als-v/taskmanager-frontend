@@ -28,13 +28,55 @@
           </select>
         </label>
 
-        <label class="field">
+        <label class="field field-inline">
           <span>Responsavel</span>
-          <select formControlName="assigneeId">
-            <option value="">Todos</option>
-            <option value="unassigned">Nao atribuido</option>
-            <option *ngFor="let member of members()" [value]="member.user_id">{{ member.name }}</option>
-          </select>
+          <div class="actor-select" [class.open]="assigneeMenuOpen()">
+            <button
+              class="actor-select-trigger"
+              type="button"
+              aria-haspopup="listbox"
+              [attr.aria-expanded]="assigneeMenuOpen()"
+              (click)="toggleAssigneeMenu()"
+            >
+              <span class="actor-select-label">{{ selectedAssigneeLabel() }}</span>
+            </button>
+
+            <div class="actor-select-menu" role="listbox" *ngIf="assigneeMenuOpen()" (scroll)="onMembersScroll($event)">
+              <button
+                class="actor-select-option"
+                type="button"
+                role="option"
+                [class.selected]="selectedAssigneeId() === ''"
+                (click)="selectAssignee('')"
+              >
+                Todos
+              </button>
+              <button
+                class="actor-select-option"
+                type="button"
+                role="option"
+                [class.selected]="selectedAssigneeId() === 'unassigned'"
+                (click)="selectAssignee('unassigned')"
+              >
+                Nao atribuido
+              </button>
+
+              <ng-container *ngIf="!membersLoading()">
+                <button
+                  class="actor-select-option"
+                  type="button"
+                  role="option"
+                  *ngFor="let member of members()"
+                  [class.selected]="selectedAssigneeId() === member.user_id"
+                  (click)="selectAssignee(member.user_id)"
+                >
+                  {{ member.name }}
+                </button>
+                <p class="load-more-state" *ngIf="membersLoadingMore()">Carregando mais...</p>
+              </ng-container>
+              <p class="table-state" *ngIf="membersLoading()">Carregando...</p>
+            </div>
+          </div>
         </label>
 
         <label class="field">
@@ -52,6 +94,13 @@
           <span>Prazo</span>
           <input type="date" formControlName="dueDate" />
         </label>
+        <label class="field">
+          <span>Ordenar</span>
+          <select formControlName="sort">
+            <option *ngFor="let option of taskSortOptions" [value]="option.value">{{ option.label }}</option>
+          </select>
+        </label>
+
       </form>
     </div>
   </header>

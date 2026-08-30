@@ -97,6 +97,7 @@ export interface TaskFilterOptions {
   assigneeId?: string;
   unassigned?: boolean;
   dueDate?: string;
+  sort?: string;
 }
 
 export type AuditAction =
@@ -250,6 +251,10 @@ export class ApiService {
     
     if (opts.dueDate) {
       params = params.set('due_date_from', `${opts.dueDate}T00:00:00`).set('due_date_to', `${opts.dueDate}T23:59:59`);
+    }
+
+    if (opts.sort?.trim()) {
+      params = params.set('sort', opts.sort.trim());
     }
 
     return this.http.get<PageResponse<TaskResponse>>(`${this.apiUrl}/api/projects/${projectId}/tasks`, { params });

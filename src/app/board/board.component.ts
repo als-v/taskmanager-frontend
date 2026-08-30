@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
@@ -27,6 +27,8 @@ interface BoardColumn {
 const CANDIDATES_PAGE_SIZE = 20;
 const MEMBERS_PAGE_SIZE = 20;
 const SCROLL_THRESHOLD_PX = 80;
+const DEFAULT_TASK_SORT = 'created_at,desc';
+
 
 @Component({
   selector: 'app-board',
@@ -52,19 +54,29 @@ export class BoardComponent implements OnInit {
     { status: 'DONE', title: 'Concluido' }
   ];
 
+  readonly taskSortOptions = [
+    { value: 'created_at,desc', label: 'Mais recentes' },
+    { value: 'created_at,asc', label: 'Mais antigas' },
+    { value: 'due_date,asc', label: 'Prazo mais próximo' },
+    { value: 'due_date,desc', label: 'Prazo mais distante' },
+    { value: 'priority,asc', label: 'Maior prioridade' },
+    { value: 'priority,desc', label: 'Menor prioridade' }
+  ];
+
   readonly taskFilterForm = this.fb.nonNullable.group({
     title: [''],
     status: [''],
     assigneeId: [''],
     priority: [''],
-    dueDate: ['']
+    dueDate: [''],
+    sort: [DEFAULT_TASK_SORT]
   });
 
   private readonly taskFilterValues = signal(this.taskFilterForm.getRawValue());
 
   readonly hasActiveTaskFilters = computed(() => {
     const filters = this.taskFilterValues();
-    return Boolean(filters.title || filters.status || filters.assigneeId || filters.priority || filters.dueDate);
+    return Boolean(filters.title || filters.status || filters.assigneeId || filters.priority || filters.dueDate || filters.sort !== DEFAULT_TASK_SORT);
   });
 
   readonly visibleColumns = computed(() => {
@@ -90,8 +102,27 @@ export class BoardComponent implements OnInit {
     if (filters.dueDate) {
       result.dueDate = filters.dueDate;
     }
+    if (filters.sort) {
+      result.sort = filters.sort;
+    }
 
     return result;
+  });
+
+  readonly assigneeMenuOpen = signal(false);
+  readonly selectedAssigneeId = signal('');
+  readonly selectedAssigneeLabel = computed(() => {
+    const id = this.selectedAssigneeId();
+
+    if (!id) {
+      return 'Todos';
+    }
+
+    if (id === 'unassigned') {
+      return 'Nao atribuido';
+    }
+
+    return this.members().find((member) => member.user_id === id)?.name ?? `Usuario #${id.slice(0, 8)}`;
   });
 
   readonly membersLoading = signal(false);
@@ -151,8 +182,32 @@ export class BoardComponent implements OnInit {
   }
 
   clearTaskFilters(): void {
-    this.taskFilterForm.reset({ title: '', status: '', assigneeId: '', priority: '', dueDate: '' });
+    this.taskFilterForm.reset({
+      title: '',
+      status: '',
+      assigneeId: '',
+      priority: '',
+      dueDate: '',
+      sort: DEFAULT_TASK_SORT
+    });
+    
     this.taskFilterValues.set(this.taskFilterForm.getRawValue());
+    this.selectedAssigneeId.set('');
+  }
+
+  toggleAssigneeMenu(): void {
+    this.assigneeMenuOpen.update((open) => !open);
+  }
+
+  selectAssignee(value: string): void {
+    this.selectedAssigneeId.set(value);
+    this.taskFilterForm.patchValue({ assigneeId: value });
+    this.assigneeMenuOpen.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  closeAssigneeMenu(): void {
+    this.assigneeMenuOpen.set(false);
   }
 
   onMembersScroll(event: Event): void {
