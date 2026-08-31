@@ -16,9 +16,10 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const notifications = inject(NotificationService);
   const token = auth.token;
   const apiUrl = environment.apiUrl.replace(/\/$/, '');
+  const isApiRequest = apiUrl ? request.url.startsWith(apiUrl) : request.url.startsWith('/api/');
   const isAuthEndpoint = AUTH_ENDPOINTS.some((path) => request.url.startsWith(`${apiUrl}${path}`));
 
-  if (!token || !apiUrl || !request.url.startsWith(apiUrl) || isAuthEndpoint) {
+  if (!token || !isApiRequest || isAuthEndpoint) {
     return next(request);
   }
 

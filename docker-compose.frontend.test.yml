@@ -1,0 +1,6 @@
+services:
+  frontend-tests:
+    image: taskmanager-frontend-tests:local
+    build:
+      context: .
+      dockerfile: Dockerfile.test
