@@ -1,7 +1,8 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
+import { API_ERROR_MESSAGES_PT_BR } from './error-messages.pt-br';
+
 const EMAIL_IN_USE_CODE = 'error.auth.email-in-use';
-const INVALID_CREDENTIALS_CODE = 'error.auth.invalid-credentials';
 
 export function getHttpErrorMessage(error: unknown, fallback = 'Nao foi possivel concluir a operacao.'): string {
   if (!(error instanceof HttpErrorResponse)) {
@@ -9,13 +10,10 @@ export function getHttpErrorMessage(error: unknown, fallback = 'Nao foi possivel
   }
 
   const code = readApiCode(error);
+  const translated = code ? translateErrorCode(code) : undefined;
 
-  if (code === EMAIL_IN_USE_CODE) {
-    return 'Este usuario ja existe. Entre com suas credenciais ou utilize a recuperacao de acesso.';
-  }
-
-  if (code === INVALID_CREDENTIALS_CODE) {
-    return 'Email ou senha incorretos.';
+  if (translated) {
+    return translated;
   }
 
   const apiMessage = readApiMessage(error);
@@ -45,6 +43,18 @@ export function getHttpErrorMessage(error: unknown, fallback = 'Nao foi possivel
 
 export function isExistingUserError(error: unknown): boolean {
   return error instanceof HttpErrorResponse && error.status === 409 && readApiCode(error) === EMAIL_IN_USE_CODE;
+}
+
+function translateErrorCode(code: string): string | undefined {
+  if (API_ERROR_MESSAGES_PT_BR[code]) {
+    return API_ERROR_MESSAGES_PT_BR[code];
+  }
+
+  if (code.startsWith('error.validation.')) {
+    return API_ERROR_MESSAGES_PT_BR['error.validation.failed'];
+  }
+
+  return undefined;
 }
 
 function readApiCode(error: HttpErrorResponse): string | undefined {

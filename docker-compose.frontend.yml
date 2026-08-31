@@ -1,0 +1,14 @@
+services:
+  frontend:
+    image: taskmanager-frontend:local
+    container_name: taskmanager-frontend
+    restart: unless-stopped
+    ports:
+      - "4200:80"
+    networks:
+      - taskmanager_network
+
+networks:
+  taskmanager_network:
+    external: true
+    name: taskmanager_network
