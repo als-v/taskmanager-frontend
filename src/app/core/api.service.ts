@@ -105,7 +105,8 @@ export interface TaskFilterOptions {
   priority?: TaskPriority;
   assigneeId?: string;
   unassigned?: boolean;
-  dueDate?: string;
+  dueDateFrom?: string;
+  dueDateTo?: string;
   sort?: string;
 }
 
@@ -277,8 +278,12 @@ export class ApiService {
       params = params.set('assignee_id', opts.assigneeId);
     }
     
-    if (opts.dueDate) {
-      params = params.set('due_date_from', `${opts.dueDate}T00:00:00`).set('due_date_to', `${opts.dueDate}T23:59:59`);
+    if (opts.dueDateFrom) {
+      params = params.set('due_date_from', `${opts.dueDateFrom}T00:00:00`);
+    }
+
+    if (opts.dueDateTo) {
+      params = params.set('due_date_to', `${opts.dueDateTo}T23:59:59`);
     }
 
     if (opts.sort?.trim()) {

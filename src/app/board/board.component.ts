@@ -62,8 +62,8 @@ export class BoardComponent implements OnInit {
     { value: 'created_at,asc', label: 'Mais antigas' },
     { value: 'due_date,asc', label: 'Prazo mais próximo' },
     { value: 'due_date,desc', label: 'Prazo mais distante' },
-    { value: 'priority,asc', label: 'Maior prioridade' },
-    { value: 'priority,desc', label: 'Menor prioridade' }
+    { value: 'priority,desc', label: 'Maior prioridade' },
+    { value: 'priority,asc', label: 'Menor prioridade' }
   ];
 
   readonly taskFilterForm = this.fb.nonNullable.group({
@@ -71,7 +71,8 @@ export class BoardComponent implements OnInit {
     status: [''],
     assigneeId: [''],
     priority: [''],
-    dueDate: [''],
+    dueDateFrom: [''],
+    dueDateTo: [''],
     sort: [DEFAULT_TASK_SORT]
   });
 
@@ -79,7 +80,7 @@ export class BoardComponent implements OnInit {
 
   readonly hasActiveTaskFilters = computed(() => {
     const filters = this.taskFilterValues();
-    return Boolean(filters.q || filters.status || filters.assigneeId || filters.priority || filters.dueDate || filters.sort !== DEFAULT_TASK_SORT);
+    return Boolean(filters.q || filters.status || filters.assigneeId || filters.priority || filters.dueDateFrom || filters.dueDateTo || filters.sort !== DEFAULT_TASK_SORT);
   });
 
   readonly visibleColumns = computed(() => {
@@ -102,8 +103,11 @@ export class BoardComponent implements OnInit {
     } else if (filters.assigneeId) {
       result.assigneeId = filters.assigneeId;
     }
-    if (filters.dueDate) {
-      result.dueDate = filters.dueDate;
+    if (filters.dueDateFrom) {
+      result.dueDateFrom = filters.dueDateFrom;
+    }
+    if (filters.dueDateTo) {
+      result.dueDateTo = filters.dueDateTo;
     }
     if (filters.sort) {
       result.sort = filters.sort;
@@ -190,7 +194,8 @@ export class BoardComponent implements OnInit {
       status: '',
       assigneeId: '',
       priority: '',
-      dueDate: '',
+      dueDateFrom: '',
+      dueDateTo: '',
       sort: DEFAULT_TASK_SORT
     });
     
