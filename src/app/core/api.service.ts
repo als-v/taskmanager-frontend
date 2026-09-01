@@ -305,6 +305,10 @@ export class ApiService {
     return this.http.patch<TaskResponse>(`${this.apiUrl}/api/projects/${projectId}/tasks/${taskId}/status`, { status });
   }
 
+  deleteTask(projectId: string, taskId: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/api/projects/${projectId}/tasks/${taskId}`);
+  }
+
   getAuditLogs(
     projectId: string,
     page: number,

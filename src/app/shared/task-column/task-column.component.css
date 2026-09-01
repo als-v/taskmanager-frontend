@@ -251,6 +251,48 @@
   text-decoration: underline;
 }
 
+.link-button-danger {
+  color: var(--danger);
+}
+
+.danger-button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  min-height: 40px;
+  border: 1px solid var(--danger);
+  border-radius: 8px;
+  padding: 0 18px;
+  color: #fff;
+  background: var(--danger);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.danger-button:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.danger-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.task-detail-danger {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.delete-confirm-text {
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 700;
+}
+
 .task-detail {
   display: grid;
   gap: 18px;

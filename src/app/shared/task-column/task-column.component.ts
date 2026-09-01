@@ -100,6 +100,8 @@ export class TaskColumnComponent implements OnInit, OnChanges {
   readonly showDetailModal = signal(false);
   readonly selectedTask = signal<TaskResponse | null>(null);
   readonly savingField = signal<DetailField | null>(null);
+  readonly confirmingDelete = signal(false);
+  readonly deletingTask = signal(false);
 
   readonly editingTitle = signal(false);
   readonly titleDraft = signal('');
@@ -243,15 +245,48 @@ export class TaskColumnComponent implements OnInit, OnChanges {
     this.statusMenuOpen.set(false);
     this.priorityMenuOpen.set(false);
     this.assigneeMenuOpen.set(false);
+    this.confirmingDelete.set(false);
     this.showDetailModal.set(true);
   }
 
   closeDetailModal(): void {
-    if (this.savingField()) {
+    if (this.savingField() || this.deletingTask()) {
       return;
     }
 
+    this.confirmingDelete.set(false);
     this.showDetailModal.set(false);
+  }
+
+  requestDeleteTask(): void {
+    this.confirmingDelete.set(true);
+  }
+
+  cancelDeleteTask(): void {
+    this.confirmingDelete.set(false);
+  }
+
+  confirmDeleteTask(): void {
+    const task = this.selectedTask();
+
+    if (!task) {
+      return;
+    }
+
+    this.deletingTask.set(true);
+
+    this.api
+      .deleteTask(this.projectId, task.id)
+      .pipe(finalize(() => this.deletingTask.set(false)))
+      .subscribe({
+        next: () => {
+          this.confirmingDelete.set(false);
+          this.showDetailModal.set(false);
+          this.load(true);
+          this.notifications.success('Tarefa excluida', `A tarefa "${task.title}" foi removida.`);
+        },
+        error: (error) => this.notifications.error('Falha ao excluir tarefa', getHttpErrorMessage(error))
+      });
   }
 
   @HostListener('document:keydown.escape')
