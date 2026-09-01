@@ -252,7 +252,7 @@
           <button class="link-button link-button-danger" type="button" (click)="requestDeleteTask()">Excluir tarefa</button>
         </ng-container>
         <ng-template #confirmDelete>
-          <span class="delete-confirm-text">Excluir esta tarefa permanentemente?</span>
+          <span class="delete-confirm-text">Excluir esta tarefa?</span>
           <div class="form-actions">
             <button class="ghost-button" type="button" [disabled]="deletingTask()" (click)="cancelDeleteTask()">Cancelar</button>
             <button class="danger-button" type="button" [disabled]="deletingTask()" (click)="confirmDeleteTask()">
